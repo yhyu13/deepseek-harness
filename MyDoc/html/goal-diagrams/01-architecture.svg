@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="1120" viewBox="0 0 1400 1120">
+  <defs>
+    <marker id="mSlate" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="10" markerHeight="10" orient="auto"><path d="M0 1 L12 6 L0 11 z" fill="#475569"/></marker>
+    <marker id="mIndigo" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="10" markerHeight="10" orient="auto"><path d="M0 1 L12 6 L0 11 z" fill="#4F46E5"/></marker>
+    <marker id="mGreen" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="10" markerHeight="10" orient="auto"><path d="M0 1 L12 6 L0 11 z" fill="#16A34A"/></marker>
+    <marker id="mAmber" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="10" markerHeight="10" orient="auto"><path d="M0 1 L12 6 L0 11 z" fill="#D97706"/></marker>
+    <marker id="mBlue" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="10" markerHeight="10" orient="auto"><path d="M0 1 L12 6 L0 11 z" fill="#2563EB"/></marker>
+  </defs>
+  <rect width="1400" height="1120" fill="#F8FAFC"/>
+  <style>
+    text{font-family:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif}
+    .t{font-size:30px;font-weight:700;fill:#0F172A}
+    .st{font-size:16px;fill:#64748B}
+    .bt{font-size:22px;font-weight:700}
+    .bs{font-size:15px;fill:#475569}
+    .chip{font-size:13px;font-weight:600}
+    .lb{font-size:15px;fill:#475569}
+  </style>
+
+  <text x="56" y="48" class="t">goal 的四个插件与数据流</text>
+  <text x="56" y="74" class="st">DeepSeek Harness · packages/goal —— 状态归状态、权限归权限、调度归调度</text>
+
+  <!-- consumers -->
+  <rect x="80" y="100" width="500" height="96" rx="12" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+  <text x="104" y="140" class="bt" fill="#1D4ED8">dsh-command-goal · /goal 命令</text>
+  <text x="104" y="168" class="bs">create / edit / pause / resume / clear</text>
+
+  <rect x="820" y="100" width="500" height="96" rx="12" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+  <text x="844" y="140" class="bt" fill="#1D4ED8">dsh-tool-goal · 模型工具</text>
+  <text x="844" y="168" class="bs">get_goal / create_goal / update_goal</text>
+
+  <!-- vertical into GoalService -->
+  <line x1="330" y1="196" x2="330" y2="278" stroke="#2563EB" stroke-width="3" marker-end="url(#mBlue)"/>
+  <rect x="348" y="224" width="210" height="28" rx="6" fill="#DBEAFE"/>
+  <text x="453" y="243" class="chip" fill="#1D4ED8" text-anchor="middle">人：改目标 / 启停</text>
+
+  <line x1="1070" y1="196" x2="1070" y2="278" stroke="#2563EB" stroke-width="3" marker-end="url(#mBlue)"/>
+  <rect x="820" y="224" width="232" height="28" rx="6" fill="#DBEAFE"/>
+  <text x="936" y="243" class="chip" fill="#1D4ED8" text-anchor="middle">模型：先过 authority</text>
+
+  <!-- GoalService -->
+  <rect x="250" y="280" width="900" height="128" rx="14" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2.5"/>
+  <text x="700" y="328" class="bt" fill="#3730A3" text-anchor="middle">dsh-goal · ctx.goals（领域，唯一持有状态）</text>
+  <text x="700" y="360" class="bs" text-anchor="middle">事件溯源 · 比较并设置 (CAS) · 严格 fold 回放</text>
+  <text x="700" y="386" class="bs" text-anchor="middle">phase（持久）正交于 activation（进程本地）</text>
+
+  <!-- append -->
+  <line x1="700" y1="408" x2="700" y2="488" stroke="#16A34A" stroke-width="3" marker-end="url(#mGreen)"/>
+  <rect x="718" y="434" width="196" height="28" rx="6" fill="#DCFCE7"/>
+  <text x="816" y="453" class="chip" fill="#15803D" text-anchor="middle">append goal/change</text>
+
+  <!-- session log -->
+  <rect x="250" y="490" width="900" height="100" rx="14" fill="#ECFDF5" stroke="#16A34A" stroke-width="2.5"/>
+  <text x="700" y="534" class="bt" fill="#166534" text-anchor="middle">Session log（持久化 · 唯一真相）</text>
+  <text x="700" y="564" class="bs" text-anchor="middle">goal/change 事件 —— 当前状态由 fold 推出，不另存表</text>
+
+  <!-- fold return: log left -> up -> into GoalService left -->
+  <path d="M250 540 H70 V344 H248" fill="none" stroke="#4F46E5" stroke-width="3" marker-end="url(#mIndigo)"/>
+  <rect x="12" y="420" width="112" height="52" rx="6" fill="#E0E7FF"/>
+  <text x="68" y="442" class="chip" fill="#3730A3" text-anchor="middle">严格 fold</text>
+  <text x="68" y="460" class="chip" fill="#3730A3" text-anchor="middle">回放到领域</text>
+
+  <!-- emit -->
+  <line x1="700" y1="590" x2="700" y2="668" stroke="#D97706" stroke-width="3" marker-end="url(#mAmber)"/>
+  <rect x="718" y="616" width="176" height="28" rx="6" fill="#FEF3C7"/>
+  <text x="806" y="635" class="chip" fill="#B45309" text-anchor="middle">emit goal/changed</text>
+
+  <!-- driver -->
+  <rect x="250" y="670" width="900" height="100" rx="14" fill="#FEF3C7" stroke="#D97706" stroke-width="2.5"/>
+  <text x="700" y="714" class="bt" fill="#92400E" text-anchor="middle">dsh-goal-round-driver（续跑调度）</text>
+  <text x="700" y="744" class="bs" text-anchor="middle">仅当 idle + active + armed + 有余量 → 预留 roundsStarted+1</text>
+
+  <!-- inject -->
+  <line x1="700" y1="770" x2="700" y2="848" stroke="#2563EB" stroke-width="3" marker-end="url(#mBlue)"/>
+  <rect x="718" y="796" width="228" height="28" rx="6" fill="#DBEAFE"/>
+  <text x="832" y="815" class="chip" fill="#1D4ED8" text-anchor="middle">注入完整 &lt;goal_round&gt;</text>
+
+  <!-- model -->
+  <rect x="250" y="850" width="900" height="96" rx="14" fill="#EFF6FF" stroke="#2563EB" stroke-width="2.5"/>
+  <text x="700" y="890" class="bt" fill="#1D4ED8" text-anchor="middle">模型 · 下一轮</text>
+  <text x="700" y="918" class="bs" text-anchor="middle">继续推进 · 有证据再 complete · 连续 N 轮同条件才 blocked</text>
+
+  <!-- model feedback: right orthogonal dashed into GoalService -->
+  <path d="M1150 898 H1330 V344 H1152" fill="none" stroke="#475569" stroke-width="3" stroke-dasharray="8 6" marker-end="url(#mSlate)"/>
+  <rect x="1170" y="600" width="220" height="52" rx="6" fill="#E2E8F0"/>
+  <text x="1280" y="622" class="chip" fill="#334155" text-anchor="middle">complete / blocked</text>
+  <text x="1280" y="640" class="chip" fill="#334155" text-anchor="middle">走 update_goal 回领域</text>
+
+  <!-- caption: idle path is the main spine, not the dashed line -->
+  <text x="700" y="972" class="bs" text-anchor="middle">未完成不走虚线：agent 回到 idle 后，driver 再走主轴注入下一轮</text>
+
+  <circle cx="80" cy="1080" r="7" fill="#4F46E5"/><text x="96" y="1085" class="lb">领域(状态)</text>
+  <circle cx="240" cy="1080" r="7" fill="#16A34A"/><text x="256" y="1085" class="lb">持久化</text>
+  <circle cx="380" cy="1080" r="7" fill="#D97706"/><text x="396" y="1085" class="lb">运行时调度</text>
+  <circle cx="540" cy="1080" r="7" fill="#2563EB"/><text x="556" y="1085" class="lb">模型 / 人类消费者</text>
+  <text x="820" y="1085" class="lb">实线 = 主路径　　虚线 = 终态写回</text>
+</svg>

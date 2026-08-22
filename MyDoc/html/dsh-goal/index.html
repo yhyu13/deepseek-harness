@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>dsh-goal 面试卡</title>
+<style>
+  :root{
+    --bg:#0f1226; --panel:#171a33; --card:#1e2342; --line:#2c3257;
+    --txt:#e8eaf6; --mut:#9aa0c0; --ok:#4ade80; --bad:#f87171; --warn:#fbbf24;
+    --accent:#7c93ff; --accent2:#b07cff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--txt);line-height:1.5}
+  header{position:sticky;top:0;z-index:10;background:linear-gradient(90deg,var(--panel),var(--card));border-bottom:1px solid var(--line);padding:.7rem 1rem;display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+  header h1{font-size:1.05rem;margin:0;margin-right:auto;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .btn{cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--txt);border-radius:8px;padding:.4rem .7rem;font-size:.82rem}
+  .btn:hover{border-color:var(--accent)}
+  .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent2));border:none;color:#0b0e1f;font-weight:600}
+  .score{font-size:.82rem;color:var(--mut)}
+  .score b{color:var(--ok)}
+  .tabs{display:flex;gap:.3rem;flex-wrap:wrap;padding:.5rem 1rem;background:var(--panel);border-bottom:1px solid var(--line)}
+  .tab{cursor:pointer;padding:.4rem .8rem;border-radius:8px 8px 0 0;font-size:.85rem;color:var(--mut);border:1px solid transparent}
+  .tab.active{background:var(--card);color:var(--accent);border-color:var(--line)}
+  .progress{height:4px;background:var(--line);position:sticky;top:0}
+  .progress>div{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0;transition:width .2s}
+  main{max-width:820px;margin:0 auto;padding:1rem}
+  .qnav{display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem;color:var(--mut);font-size:.82rem}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:1rem 1.1rem}
+  .stem{font-size:1rem;margin:0 0 .9rem}
+  .options{display:grid;gap:.5rem}
+  .opt{border:1px solid var(--line);border-radius:8px;padding:.6rem .8rem;cursor:pointer;transition:.15s;font-size:.9rem}
+  .opt:hover{border-color:var(--accent)}
+  .opt.sel{border-color:var(--accent);background:rgba(124,147,255,.12)}
+  .opt.correct{border-color:var(--ok);background:rgba(74,222,128,.12)}
+  .opt.wrong{border-color:var(--bad);background:rgba(248,113,113,.12)}
+  .tf{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+  .tf .opt{text-align:center;font-weight:600}
+  .explain{margin-top:.8rem;font-size:.85rem;color:var(--mut);border-top:1px dashed var(--line);padding-top:.6rem;white-space:pre-line}
+  .explain .ok{color:var(--ok)} .explain .bad{color:var(--bad)}
+  .followups{margin-top:.6rem;padding:.6rem .7rem;background:rgba(176,124,255,.08);border:1px dashed var(--accent2);border-radius:8px;font-size:.84rem}
+  /* drag-fill */
+  .blanks{font-size:1rem;line-height:2}
+  .slot{display:inline-block;min-width:90px;padding:.1rem .5rem;margin:0 .2rem;border:1.5px dashed var(--accent);border-radius:6px;text-align:center;color:var(--accent);min-height:1.6rem;vertical-align:middle}
+  .slot.filled{color:var(--txt);border-style:solid;background:rgba(124,147,255,.12)}
+  .slot.correct{border-color:var(--ok);color:var(--ok);background:rgba(74,222,128,.12)}
+  .slot.wrong{border-color:var(--bad);color:var(--bad);background:rgba(248,113,113,.12)}
+  .pool{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.8rem}
+  .chip{padding:.35rem .7rem;border:1px solid var(--line);border-radius:20px;cursor:grab;font-size:.85rem;background:var(--panel)}
+  .chip:hover{border-color:var(--accent)}
+  .chip.used{opacity:.3;cursor:default}
+  .overview{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:20;padding:1rem;overflow:auto}
+  .overview.open{display:block}
+  .ovPanel{max-width:820px;margin:2rem auto;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:1rem}
+  .ovFilter{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.8rem}
+  .ovGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:.5rem}
+  .ovItem{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:.5rem;cursor:pointer;font-size:.78rem}
+  .ovItem:hover{border-color:var(--accent)}
+  .ovItem.ok{border-color:var(--ok)} .ovItem.bad{border-color:var(--bad)} .ovItem.none{opacity:.6}
+  .ovNum{font-size:1.1rem;font-weight:700;margin-bottom:.2rem}
+  @media(max-width:560px){.tabs{padding-inline:.6rem}main{padding:.6rem}.card{padding:.8rem}}
+</style>
+</head>
+<body>
+
+<header>
+  <h1 id="hdrTitle">Interview Cards</h1>
+  <span class="score">Score: <b id="scoreVal">0</b>/<span id="scoreTot">0</span></span>
+  <button class="btn" onclick="openOverview()">Overview</button>
+  <button class="btn" onclick="reshuffleAll()">Reshuffle</button>
+  <button class="btn" onclick="resetAll()">Reset all</button>
+</header>
+
+<div class="tabs" id="tabs">
+  <div class="tab active" data-mode="drag" onclick="switchMode('drag')">Drag-fill</div>
+  <div class="tab" data-mode="single" onclick="switchMode('single')">Single</div>
+  <div class="tab" data-mode="multi" onclick="switchMode('multi')">Multi</div>
+  <div class="tab" data-mode="tf" onclick="switchMode('tf')">True/False</div>
+</div>
+<div class="progress"><div id="progBar"></div></div>
+
+<main>
+  <div class="qnav">
+    <button class="btn" onclick="prevQ()">&#9664; Prev</button>
+    <span id="qpos">- / -</span>
+    <button class="btn" onclick="nextQ()">Next &#9654;</button>
+  </div>
+  <div class="card" id="qcard"></div>
+</main>
+
+<div class="overview" id="overview" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="ovPanel">
+    <h2 style="margin:0 0 .6rem;font-size:1.1rem">Overview</h2>
+    <div class="ovFilter">
+      <button class="btn" data-f="all" onclick="setOvFilter('all')">All</button>
+      <button class="btn" data-f="ok" onclick="setOvFilter('ok')">Correct</button>
+      <button class="btn" data-f="bad" onclick="setOvFilter('bad')">Wrong</button>
+      <button class="btn" data-f="none" onclick="setOvFilter('none')">Unanswered</button>
+    </div>
+    <div class="ovGrid" id="ovGrid"></div>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   DATA START  -- EDIT ONLY THIS BLOCK
+   ===================================================================== */
+const TITLE = "dsh-goal 面试卡";
+const SUBTITLE = "状态可回放，权限必须重授";
+
+const dragQuestions = [
+  {
+    stem: "四个插件里只有 {0} 持有状态；模型、命令、调度都通过 {1} 消费它。",
+    answers: ["dsh-goal", "ctx.goals"],
+    pool: ["dsh-goal", "ctx.goals", "agent-loop", "dsh-tool-goal", "SQLite"],
+    perSlotExplanation: [
+      "dsh-goal 是 GoalService。tool / command / round-driver 都不拥有状态。",
+      "公共入口是 ctx.goals，不是 agent-loop 里的分支。"
+    ]
+  },
+  {
+    stem: "phase 回答 {0}，activation 回答 {1}；后者永不落盘。",
+    answers: ["进展到哪", "能否自动续"],
+    pool: ["进展到哪", "能否自动续", "谁能改目标", "轮次上限", "模型温度"],
+    perSlotExplanation: [
+      "GoalPhase：active / paused / blocked / complete，写进 goal/change。",
+      "GoalActivation：armed / disarmed，只在当前进程；session-start 强制 disarmed。"
+    ]
+  },
+  {
+    stem: "CAS 每次变更必须带精确的 {0} 和 {1}，过期抛 GOAL_STALE_REVISION。",
+    answers: ["id", "revision"],
+    pool: ["id", "revision", "phase", "activation", "round"],
+    perSlotExplanation: [
+      "GoalId 是 branded 不透明 ID。",
+      "revision 单调 +1；模型必须先 get_goal 再原样复制。"
+    ]
+  },
+  {
+    stem: "空闲自启动四个条件：{0} + active + {1} + 轮次有余量。",
+    answers: ["idle", "armed"],
+    pool: ["idle", "armed", "running", "paused", "queued"],
+    perSlotExplanation: [
+      "agent.status 必须是 idle；busy 时拒绝且不排队。",
+      "armed 是进程本地授权；恢复后即使 phase=active 也是 disarmed。"
+    ]
+  },
+  {
+    stem: "反漂移：每轮注入完整 {0}；blocked 需连续 {1} 轮同一条件。",
+    answers: ["objective", "N"],
+    pool: ["objective", "N", "phase", "prompt", "budget"],
+    perSlotExplanation: [
+      "renderGoalRoundPrompt 把 JSON.stringify(objective) 写进 <goal_round>。",
+      "默认 blockedAfterConsecutiveRounds = 3，是 Config 字段不是硬编码。"
+    ]
+  }
+];
+
+const singleQuestions = [
+  {
+    stem: "dsh-goal 为什么不学 Codex 做成「每个会话一行 SQLite」？",
+    options: [
+      "A. SQLite 在 Node 里不好用",
+      "B. 当前态由 session log 的 goal/change fold 推出，日志即唯一真相",
+      "C. 一行 SQLite 没法做 CAS",
+      "D. 投影层禁止访问数据库"
+    ],
+    correct: 1,
+    optionExplanations: [
+      "错：选型不是因为 SQLite 不好用。",
+      "对：Harness 约定 model-visible ⟺ logged；goal 走事件溯源。",
+      "错：Codex 的行存储也能做 CAS；差别在真相源。",
+      "错：投影 fold 读的是同一条 session 事件流。"
+    ]
+  },
+  {
+    stem: "会话恢复或 fork 之后，一条 phase=active 的 goal 会怎样？",
+    options: [
+      "A. 自动 armed，driver 马上续跑",
+      "B. phase 仍可是 active，但 activation=disarmed，必须等人 resume",
+      "C. 被清成 tombstone",
+      "D. 变成 paused"
+    ],
+    correct: 1,
+    optionExplanations: [
+      "错：这正是要避免的「授权随状态回放」。",
+      "对：agent/session-start 强制 disarmed。状态可回放，权限必须重授。",
+      "错：clear 才写 tombstone。",
+      "错：phase 不变。"
+    ]
+  },
+  {
+    stem: "模型工具改目标（create / edit / pause / resume）的资格是什么？",
+    options: [
+      "A. 只要复制了正确的 revision",
+      "B. 提示词里写了「你是人类」即可",
+      "C. 运行时根 agent 的当前轮次里有宿主签发的 { kind: 'user' } 消息",
+      "D. 持久 fork 谱系上曾经是 root"
+    ],
+    correct: 2,
+    optionExplanations: [
+      "错：CAS 是另一层；资格在 authority.ts。",
+      "错：提示词不能当权限。",
+      "对：requireDirectHuman。子代理 / 注入必须自带 source。",
+      "错：README 写明持久 fork 谱系不降权，但 live 子代理所有权会降权；资格看当前根 + user 消息。"
+    ]
+  },
+  {
+    stem: "投影 fold（applyGoalProjection）遇到畸形 goal/change 时做什么？",
+    options: [
+      "A. 和严格 fold 一样抛错",
+      "B. 返回同一引用，保持上一份投影",
+      "C. 写成 null",
+      "D. 自动 disarm"
+    ],
+    correct: 1,
+    optionExplanations: [
+      "错：严格 fold 才 fail-loud。",
+      "对：投影是 last-wins / 同引用短路；正确性由写入侧和 invariant 负责。",
+      "错：只有 clear 才投影成 null。",
+      "错：activation 根本不进投影。"
+    ]
+  },
+  {
+    stem: "complete 可以从哪些 phase 进入？",
+    options: [
+      "A. 只能从 active",
+      "B. active / paused / blocked（不能已经是 complete）",
+      "C. 任意 phase 包括 complete",
+      "D. 只能从 blocked，因为要先证明受阻"
+    ],
+    correct: 1,
+    optionExplanations: [
+      "错：那是 block 的规则。",
+      "对：GoalService.complete 允许集合是 active, paused, blocked。",
+      "错：已经 complete 再 complete 会 GOAL_INVALID_TRANSITION。",
+      "错：complete 不依赖 blocked。"
+    ]
+  },
+  {
+    stem: "round-driver 何时预留下一轮？",
+    options: [
+      "A. 每秒 timer 扫一次",
+      "B. agent 一 busy 就排队",
+      "C. idle + active + armed + 有余量，且每次空闲最多一次",
+      "D. 模型一说「我还没做完」就立刻再开一轮"
+    ],
+    correct: 2,
+    optionExplanations: [
+      "错：不是定时器轮询。",
+      "错：busy 时拒绝，不排队。",
+      "对：readyToDrive + 余量检查；followup 一条 <goal_round>。",
+      "错：未完成不经 update_goal；等 idle 再走主轴。"
+    ]
+  }
+];
+
+const multiQuestions = [
+  {
+    stem: "关于 activation，哪些是对的？（多选）",
+    options: [
+      "永不落盘，不进 GoalProjection",
+      "agent/session-start 强制 disarmed",
+      "create / resume → armed",
+      "pause / complete / block / clear → disarmed",
+      "edit 保持原样",
+      "fork 会继承上一进程的 armed"
+    ],
+    correct: [0, 1, 2, 3, 4],
+    optionExplanations: [
+      "对：GoalProjection 故意不含 activation。",
+      "对：恢复 / fork 都走 session-start。",
+      "对：create 和 resume 都会 armed。",
+      "对：这些操作 disarm 自动续跑。",
+      "对：edit 不改 phase 也不改 activation。",
+      "错：fork 后强制 disarmed，必须人再 resume。"
+    ]
+  },
+  {
+    stem: "哪些工具动作要求「直接人类输入」，goal-round 窄通道不够？（多选）",
+    options: [
+      "create_goal",
+      "update_goal action=edit",
+      "update_goal action=pause",
+      "update_goal action=resume",
+      "update_goal action=complete",
+      "get_goal"
+    ],
+    correct: [0, 1, 2, 3],
+    optionExplanations: [
+      "对：改目标要 requireDirectHuman。",
+      "对：edit 改 objective / cap。",
+      "对：pause 是启停。",
+      "对：resume 重新授续跑权。",
+      "错：complete / blocked 走 completionAuthority，goal-round 也可以，但只能报终止。",
+      "错：get_goal 是读，不改状态。"
+    ]
+  },
+  {
+    stem: "哪些情况会让自动续跑停下来？（多选）",
+    options: [
+      "phase=complete",
+      "phase=paused",
+      "activation=disarmed",
+      "roundsStarted >= maxGoalRounds",
+      "agent 正在 running（非 idle）",
+      "模型在上一轮说过「我还要继续」"
+    ],
+    correct: [0, 1, 2, 3, 4],
+    optionExplanations: [
+      "对：终态，driver 不再预留。",
+      "对：paused 不是 active。",
+      "对：恢复后即使 active 也不续。",
+      "对：会 block(round-limit)。",
+      "对：readyToDrive 要求 idle。",
+      "错：口头「继续」不是状态机输入；未完成就等下一次 idle。"
+    ]
+  }
+];
+
+const trueFalseQuestions = [
+  {
+    stem: "activation 会随 session log 一起回放，所以恢复后的会话会自动续跑。",
+    correct: false,
+    explanation:
+      "常见误解：持久态 = 执行授权。\n正确：phase 可回放；activation 只在进程内，session-start 强制 disarmed。必须等人 resume。",
+    followUps: [
+      "Q: edit 会不会改变 activation？ -> 不会，保持原样。",
+      "Q: create 呢？ -> create 会 armed。"
+    ]
+  },
+  {
+    stem: "投影 fold 和严格 fold 一样会校验 phase 转移。",
+    correct: false,
+    explanation:
+      "常见误解：两个 fold 职责相同。\n正确：严格 fold（fold.ts）非法即抛；投影 fold 只留最新整份快照，畸形事件返回同一引用。",
+    followUps: [
+      "Q: 那谁保证投影不错？ -> 写入侧 GoalService 先校验；package invariant 在安装处 fail-loud。"
+    ]
+  },
+  {
+    stem: "子代理只要复制了正确的 goal_id 和 revision，就能 update_goal。",
+    correct: false,
+    explanation:
+      "常见误解：CAS 等于权限。\n正确：goalToolExecution 要求精确匹配的存活 agent + 当前 initiator；改目标还要根 agent 上的 {kind:'user'}。",
+    followUps: [
+      "Q: complete 呢？ -> 当前 goal round 可以报终止，仍不能改目标。"
+    ]
+  },
+  {
+    stem: "paused 的 goal 可以直接 complete。",
+    correct: true,
+    explanation:
+      "正确：complete 允许集合是 active / paused / blocked。block 才只能从 active 进入。",
+    followUps: [
+      "Q: paused 能不能 block？ -> 不能。",
+      "Q: complete 之后能不能 resume？ -> 不能，complete 是终态。"
+    ]
+  },
+  {
+    stem: "Agent.followup() / steer() 省略 source 时会默认成 user，所以非人生产者必须自带 source。",
+    correct: true,
+    explanation:
+      "正确：authority.ts 注释写明省略 source 解析为 user。调度器若忘了打标，会误拿到人类权限。",
+    followUps: [
+      "Q: goal round 的 source 是什么？ -> kind:'goal' + goalId + revision + round。"
+    ]
+  },
+  {
+    stem: "agent 正在跑时，driver 会把下一轮续跑排进队列，idle 后再执行。",
+    correct: false,
+    explanation:
+      "常见误解：续跑 = 重试队列。\n正确：不 idle 就拒绝，不排队；每次空闲最多一续。",
+    followUps: [
+      "Q: 有人类消息插进 nextTurn 呢？ -> competingQueued=true，本轮 goal followup 标 stale，让路。"
+    ]
+  },
+  {
+    stem: "进入模型请求的续跑提示可以只活在内存里，重启丢掉即可。",
+    correct: false,
+    explanation:
+      "常见误解：steering 是临时的。\n正确：model-visible ⟺ logged。续跑提示是带 GoalMessageSource 的 user/message 事件。",
+    followUps: [
+      "Q: 什么会计入 roundsStarted？ -> 被 admit 的、round>0 的 goal user/message。"
+    ]
+  },
+  {
+    stem: "block 可以从 paused 进入，因为暂停也算停住了。",
+    correct: false,
+    explanation:
+      "常见误解：所有「停」都等价。\n正确：block 只从 active；paused 是人主动停，blocked 是问题停。",
+    followUps: [
+      "Q: blocked 怎么回去？ -> resume（且轮次仍有余量）。"
+    ]
+  }
+];
+/* =====================================================================
+   DATA END  -- DO NOT EDIT BELOW UNLESS YOU KNOW THE TEMPLATE
+   ===================================================================== */
+
+/* keep read-only originals for reshuffle */
+const _origDrag   = JSON.parse(JSON.stringify(dragQuestions));
+const _origSingle = JSON.parse(JSON.stringify(singleQuestions));
+const _origMulti  = JSON.parse(JSON.stringify(multiQuestions));
+const _origTF     = JSON.parse(JSON.stringify(trueFalseQuestions));
+
+const MODES = ["drag","single","multi","tf"];
+let mode = "drag";
+let idx = { drag:0, single:0, multi:0, tf:0 };
+let sel = { drag:{}, single:{}, multi:{}, tf:{} }; // per-question selections
+let checked = { drag:{}, single:{}, multi:{}, tf:{} };
+let ovFilter = "all";
+
+const LS_KEY = "interview-cards-" + TITLE;
+
+function shuffleArray(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+function shuffleOptions(q){
+  const ind=q.options.map((_,i)=>i);
+  const sh=shuffleArray(ind);
+  const newOptions=sh.map(i=>q.options[i]);
+  const newExpl=sh.map(i=>(q.optionExplanations||[])[i]||"");
+  const newCorrect=Array.isArray(q.correct)
+    ? q.correct.map(o=>sh.indexOf(o)).filter(i=>i>=0).sort((a,b)=>a-b)
+    : sh.indexOf(q.correct);
+  return {...q, options:newOptions, optionExplanations:newExpl, correct:newCorrect};
+}
+function questionsFor(m){ return m==="drag"?dragQuestions:m==="single"?singleQuestions:m==="multi"?multiQuestions:trueFalseQuestions; }
+function curArr(){ return questionsFor(mode); }
+function curQ(){ const a=curArr(); return a[idx[mode]]||null; }
+
+function save(){ try{ localStorage.setItem(LS_KEY, JSON.stringify({sel,checked,idx})); }catch(e){} }
+function load(){ try{ const r=JSON.parse(localStorage.getItem(LS_KEY)); if(r){sel=r.sel||sel;checked=r.checked||checked;idx=r.idx||idx;} }catch(e){} }
+
+function updateScore(){
+  let got=0, tot=0;
+  MODES.forEach(m=>{
+    const qs=questionsFor(m); tot+=qs.length;
+    qs.forEach((_,i)=>{ if(checked[m][i]){ got += isCorrect(m,i)?1:0; } });
+  });
+  document.getElementById("scoreVal").textContent=got;
+  document.getElementById("scoreTot").textContent=tot;
+  const pos=(idx[mode]+1)||0, len=curArr().length;
+  document.getElementById("qpos").textContent= len?`${pos} / ${len}`:"- / -";
+  document.getElementById("progBar").style.width= len?`${(pos/len)*100}%`:"0";
+}
+function isCorrect(m,i){
+  const qs=questionsFor(m), q=qs[i]; if(!q) return false;
+  if(m==="drag"){
+    const s=sel[m][i]||{}; return q.answers.every((a,k)=>s[k]===a);
+  }
+  if(m==="tf"){ return sel[m][i]===q.correct; }
+  const s=sel[m][i]||[]; const c=q.correct;
+  if(!Array.isArray(c)) return s[0]===c;
+  if(s.length!==c.length) return false;
+  return c.every(x=>s.includes(x));
+}
+
+function render(){
+  const card=document.getElementById("qcard"); card.innerHTML="";
+  const q=curQ(); if(!q){ card.innerHTML="<p>No questions in this section.</p>"; updateScore(); return; }
+  if(mode==="drag") renderDrag(card,q); else if(mode==="single") renderChoice(card,q,false); else if(mode==="multi") renderChoice(card,q,true); else renderTF(card,q);
+  updateScore(); save();
+}
+
+function renderDrag(card,q){
+  const gi=idx.drag, isChecked=checked.drag[gi], s=sel.drag[gi]||{};
+  const parts=q.stem.split(/\{(\d+)\}/g);
+  let stemHtml=""; for(let k=0;k<parts.length;k++){ if(k%2===0){stemHtml+=escapeHtml(parts[k]);} else {const slot=+parts[k]; const val=s[slot]; const cls=val?("slot filled"+(isChecked?(val===q.answers[slot]?" correct":" wrong"):"")):"slot"; stemHtml+=`<span class="${cls}" data-slot="${slot}" ondragover="allowDrop(event)" ondrop="dropSlot(event,${slot})" onclick="unsetSlot(${slot})">${escapeHtml(val||"?")}</span>`;} }
+  const cardEl=card; cardEl.innerHTML=`<p class="stem">${stemHtml}</p>`;
+  const pool=document.createElement("div"); pool.className="pool";
+  const usedSlots=Object.values(s);
+  q.pool.forEach(term=>{
+    const used=usedSlots.includes(term);
+    const chip=document.createElement("div");
+    chip.className="chip"+(used?" used":"");
+    chip.draggable=!used && !isChecked;
+    chip.textContent=term;
+    chip.dataset.term=term;
+    if(!used && !isChecked){
+      chip.ondragstart=e=>e.dataTransfer.setData("text",term);
+      chip.onclick=()=>fillNextEmpty(term);
+    }
+    pool.appendChild(chip);
+  });
+  cardEl.appendChild(pool);
+  if(isChecked){
+    const ex=document.createElement("div"); ex.className="explain";
+    q.answers.forEach((a,k)=>{ ex.innerHTML+=`<span class="${s[k]===a?'ok':'bad'}">Slot ${k+1}: ${s[k]===a?'correct':'wrong (expected '+a+')'}</span> - ${(q.perSlotExplanation||[])[k]||''}<br>`; });
+    cardEl.appendChild(ex);
+  }
+  addCheckReset(cardEl, ()=>!Object.keys(s).length, ()=>{ checked.drag[gi]=true; render(); }, ()=>{ delete sel.drag[gi]; delete checked.drag[gi]; render(); });
+}
+function fillNextEmpty(term){
+  if(checked.drag[idx.drag]) return;
+  const q=curQ(); const s=sel.drag[idx.drag]||(sel.drag[idx.drag]={});
+  for(let k=0;k<q.answers.length;k++){ if(s[k]===undefined){ s[k]=term; render(); return; } }
+}
+function unsetSlot(slot){
+  if(checked.drag[idx.drag]) return;
+  const s=sel.drag[idx.drag]; if(s){ delete s[slot]; render(); }
+}
+function allowDrop(e){ e.preventDefault(); }
+function dropSlot(e,slot){
+  e.preventDefault(); if(checked.drag[idx.drag]) return;
+  const term=e.dataTransfer.getData("text"); if(!term) return;
+  const s=sel.drag[idx.drag]||(sel.drag[idx.drag]={}); s[slot]=term; render();
+}
+
+function renderChoice(card,q,isMulti){
+  const gi=idx[mode], isChecked=checked[mode][gi], s=sel[mode][gi]||(sel[mode][gi]=[]);
+  const stem=document.createElement("p"); stem.className="stem"; stem.textContent=q.stem; card.appendChild(stem);
+  const wrap=document.createElement("div"); wrap.className="options";
+  q.options.forEach((opt,i)=>{
+    const selNow=isMulti?s.includes(i):(s[0]===i);
+    let cls="opt"; if(!isChecked&&selNow) cls+=" sel";
+    if(isChecked){
+      const corr=Array.isArray(q.correct)?q.correct.includes(i):(q.correct===i);
+      if(corr) cls+=" correct"; else if(selNow) cls+=" wrong";
+    }
+    const el=document.createElement("div"); el.className=cls; el.textContent=opt;
+    if(!isChecked) el.onclick=()=>toggleChoice(i,isMulti);
+    wrap.appendChild(el);
+  });
+  card.appendChild(wrap);
+  if(isChecked){
+    const ex=document.createElement("div"); ex.className="explain";
+    q.options.forEach((opt,i)=>{
+      const corr=Array.isArray(q.correct)?q.correct.includes(i):(q.correct===i);
+      ex.innerHTML+=`<span class="${corr?'ok':'bad'}">${corr?'[+]':'[x]'} ${escapeHtml(opt)}</span> - ${(q.optionExplanations||[])[i]||''}<br>`;
+    });
+    if(q.followUps) ex.appendChild(buildFollowups(q.followUps));
+    card.appendChild(ex);
+  }
+  addCheckReset(card, ()=>isMulti? !s.length : s.length===0, ()=>{ checked[mode][gi]=true; render(); }, ()=>{ sel[mode][gi]=[]; delete checked[mode][gi]; render(); });
+}
+function toggleChoice(i,isMulti){
+  if(checked[mode][idx[mode]]) return;
+  const s=sel[mode][idx[mode]]||(sel[mode][idx[mode]]=[]);
+  if(isMulti){ const p=s.indexOf(i); if(p>=0) s.splice(p,1); else s.push(i); }
+  else { s[0]=i; }
+  render();
+}
+
+function renderTF(card,q){
+  const gi=idx.tf, isChecked=checked.tf[gi], s=sel.tf[gi];
+  const stem=document.createElement("p"); stem.className="stem"; stem.textContent=q.stem; card.appendChild(stem);
+  const wrap=document.createElement("div"); wrap.className="options tf";
+  [{l:"True",v:true},{l:"False",v:false}].forEach(o=>{
+    let cls="opt"; if(!isChecked&&s===o.v) cls+=" sel";
+    if(isChecked){ const corr=q.correct===o.v; if(corr) cls+=" correct"; else if(s===o.v) cls+=" wrong"; }
+    const el=document.createElement("div"); el.className=cls; el.textContent=o.l;
+    if(!isChecked) el.onclick=()=>{ sel.tf[gi]=o.v; render(); };
+    wrap.appendChild(el);
+  });
+  card.appendChild(wrap);
+  if(isChecked){
+    const ex=document.createElement("div"); ex.className="explain";
+    ex.innerHTML=`<span class="${s===q.correct?'ok':'bad'}">${s===q.correct?'Correct':'Wrong'}</span><br>${escapeHtml(q.explanation||'')}`;
+    if(q.followUps) ex.appendChild(buildFollowups(q.followUps));
+    card.appendChild(ex);
+  }
+  addCheckReset(card, ()=>s===undefined, ()=>{ checked.tf[gi]=true; render(); }, ()=>{ delete sel.tf[gi]; delete checked.tf[gi]; render(); });
+}
+function buildFollowups(list){
+  const w=document.createElement("div"); w.className="followups";
+  w.innerHTML="<b>Interviewer follow-ups:</b><br>"+list.map(f=>escapeHtml(f)).join("<br>");
+  return w;
+}
+function addCheckReset(card, noSelFn, checkFn, resetFn){
+  const row=document.createElement("div"); row.style.cssText="margin-top:.8rem;display:flex;gap:.5rem";
+  const ck=document.createElement("button"); ck.className="btn primary"; ck.textContent="Check answer";
+  ck.disabled=noSelFn(); ck.onclick=checkFn;
+  if(ck.disabled) ck.style.opacity=".5";
+  const rs=document.createElement("button"); rs.className="btn"; rs.textContent="Reset"; rs.onclick=resetFn;
+  row.appendChild(ck); row.appendChild(rs); card.appendChild(row);
+}
+
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function switchMode(m){ mode=m; document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.mode===m)); render(); }
+function nextQ(){ const a=curArr(); if(a.length) idx[mode]=(idx[mode]+1)%a.length; render(); }
+function prevQ(){ const a=curArr(); if(a.length) idx[mode]=(idx[mode]-1+a.length)%a.length; render(); }
+
+function openOverview(){ renderOverview(); document.getElementById("overview").classList.add("open"); }
+function setOvFilter(f){ ovFilter=f; renderOverview(); }
+function renderOverview(){
+  document.querySelectorAll(".ovFilter .btn").forEach(b=>b.classList.toggle("primary",b.dataset.f===ovFilter));
+  const grid=document.getElementById("ovGrid"); grid.innerHTML="";
+  let n=0;
+  MODES.forEach(m=>{
+    const qs=questionsFor(m);
+    qs.forEach((q,i)=>{
+      n++; const ok=checked[m][i]&&isCorrect(m,i); const bad=checked[m][i]&&!isCorrect(m,i); const none=!checked[m][i];
+      if(ovFilter!=="all"){ if(ovFilter==="ok"&&!ok) return; if(ovFilter==="bad"&&!bad) return; if(ovFilter==="none"&&!none) return; }
+      const el=document.createElement("div"); el.className="ovItem"+(ok?" ok":bad?" bad":" none");
+      el.innerHTML=`<div class="ovNum">${n}</div><div>${m} #${i+1}</div><div style="color:var(--mut);font-size:.72rem">${ok?'correct':bad?'wrong':'unanswered'}</div>`;
+      el.onclick=()=>{ mode=m; idx[m]=i; document.getElementById("overview").classList.remove("open"); switchMode(m); };
+      grid.appendChild(el);
+    });
+  });
+  if(!grid.children.length) grid.innerHTML="<p style='color:var(--mut)'>No items in this filter.</p>";
+}
+
+function resetAll(){ sel={drag:{},single:{},multi:{},tf:{}}; checked={drag:{},single:{},multi:{},tf:{}}; render(); }
+function reshuffleAll(){
+  resetAll();
+  // reassign arrays (they were const-declared with let-like reassignment via window)
+  // Note: arrays are declared with const above; to reshuffle we mutate in place.
+  const nd=shuffleArray(_origDrag), ns=shuffleArray(_origSingle).map(shuffleOptions), nm=shuffleArray(_origMulti).map(shuffleOptions), nt=shuffleArray(_origTF);
+  dragQuestions.length=0; dragQuestions.push(...nd);
+  singleQuestions.length=0; singleQuestions.push(...ns);
+  multiQuestions.length=0; multiQuestions.push(...nm);
+  trueFalseQuestions.length=0; trueFalseQuestions.push(...nt);
+  idx={drag:0,single:0,multi:0,tf:0};
+  switchMode(mode);
+}
+
+document.addEventListener("keydown",e=>{
+  if(e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA") return;
+  if(e.key==="ArrowRight") nextQ();
+  else if(e.key==="ArrowLeft") prevQ();
+});
+
+(function init(){
+  document.getElementById("hdrTitle").textContent=TITLE;
+  // hide drag tab if no drag questions (Detail card mode)
+  if(!dragQuestions.length){ document.querySelector('.tab[data-mode="drag"]').style.display="none"; if(mode==="drag") mode="single"; }
+  load(); switchMode(mode);
+})();
+</script>
+</body>
+</html>

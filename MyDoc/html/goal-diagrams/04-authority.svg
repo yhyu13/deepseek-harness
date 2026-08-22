@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1320" height="760" viewBox="0 0 1320 760">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#64748B"/></marker>
+  </defs>
+  <rect width="1320" height="760" fill="#F8FAFC"/>
+  <style>
+    text{font-family:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif}
+    .t{font-size:30px;font-weight:700;fill:#0F172A}
+    .st{font-size:16px;fill:#64748B}
+    .ly{font-size:19px;font-weight:700}
+    .ls{font-size:15px;fill:#334155}
+    .no{font-size:14px;fill:#475569}
+    .rh{font-size:17px;font-weight:700;fill:#B91C1C}
+    .rb{font-size:14px;fill:#7F1D1D}
+    .sh{font-size:13px;font-weight:700;fill:#9F1239}
+  </style>
+  <text x="60" y="50" class="t">权限：运行时校验，而非提示词</text>
+  <text x="60" y="74" class="st">三层执行期硬校验 —— 子代理、注入消息、过期回合都过不去</text>
+
+  <rect x="60" y="110" width="720" height="140" rx="14" fill="#EFF6FF" stroke="#2563EB" stroke-width="2.5"/>
+  <text x="90" y="148" class="ly" fill="#1D4ED8">第 1 层 · 调用者必须是存活的</text>
+  <text x="90" y="180" class="ls">精确匹配的存活 agent · status = running · 当前 initiator · 处于开放 turn</text>
+  <text x="90" y="208" class="no">过期回合（turn/end 之后）、已销毁 agent、initiator 不匹配 → 直接拒绝</text>
+
+  <rect x="60" y="310" width="720" height="140" rx="14" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2.5"/>
+  <text x="90" y="348" class="ly" fill="#5B21B6">第 2 层 · 改目标需直接人类输入</text>
+  <text x="90" y="380" class="ls">宿主签发的 { kind: 'user' } 消息 → 才允许 create / edit / pause / resume</text>
+  <text x="90" y="408" class="no">宿主打标、模型无法伪造；子代理 / 注入 / 调度器必须自带 source，不能继承人类权限</text>
+
+  <rect x="60" y="510" width="720" height="140" rx="14" fill="#ECFDF5" stroke="#16A34A" stroke-width="2.5"/>
+  <text x="90" y="548" class="ly" fill="#166534">第 3 层 · 终态报告走窄通道</text>
+  <text x="90" y="580" class="ls">complete / blocked ← 直接人类 或 当前 goal round（只能报告终止，不能改目标）</text>
+  <text x="90" y="608" class="no">blocked 另需：连续 N 轮（默认 3）同条件 + 具体理由</text>
+
+  <line x1="420" y1="250" x2="420" y2="308" stroke="#64748B" stroke-width="2" marker-end="url(#a)"/>
+  <line x1="420" y1="450" x2="420" y2="508" stroke="#64748B" stroke-width="2" marker-end="url(#a)"/>
+
+  <rect x="840" y="110" width="420" height="540" rx="14" fill="#FEF2F2" stroke="#DC2626" stroke-width="2.5"/>
+  <text x="870" y="152" class="rh">会被拒绝的调用</text>
+  <line x1="870" y1="168" x2="1230" y2="168" stroke="#FECACA" stroke-width="2"/>
+  <text x="870" y="198" class="sh">权限层（authority.ts）</text>
+  <text x="870" y="228" class="rb">× 子代理（非 root agent）</text>
+  <text x="870" y="258" class="rb">× 插件 / 注入消息（无 {kind:'user'}）</text>
+  <text x="870" y="288" class="rb">× 过期 turn / 无开放 turn</text>
+  <text x="870" y="318" class="rb">× initiator 不匹配 / agent 已销毁</text>
+  <line x1="870" y1="342" x2="1230" y2="342" stroke="#FECACA" stroke-width="2"/>
+  <text x="870" y="372" class="sh">相邻层（不是本图三层）</text>
+  <text x="870" y="402" class="rb">× 恢复后未 resume（disarmed，调度不续）</text>
+  <text x="870" y="432" class="rb">× 过期 revision（CAS 拒绝）</text>
+  <line x1="870" y1="460" x2="1230" y2="460" stroke="#FECACA" stroke-width="2"/>
+  <text x="870" y="500" class="rb">提示词只能引导「该不该」，</text>
+  <text x="870" y="528" class="rb">执行期校验才决定「能不能」。</text>
+</svg>

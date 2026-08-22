@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DSH Harness — 概念卡</title>
+<style>
+  :root{
+    --bg:#0f1226; --panel:#171a33; --card:#1e2342; --line:#2c3257;
+    --txt:#e8eaf6; --mut:#9aa0c0; --ok:#4ade80; --bad:#f87171; --warn:#fbbf24;
+    --accent:#7c93ff; --accent2:#b07cff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--txt);line-height:1.5}
+  header{position:sticky;top:0;z-index:10;background:linear-gradient(90deg,var(--panel),var(--card));border-bottom:1px solid var(--line);padding:.7rem 1rem;display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+  header h1{font-size:1.05rem;margin:0;margin-right:auto;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .btn{cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--txt);border-radius:8px;padding:.4rem .7rem;font-size:.82rem}
+  .btn:hover{border-color:var(--accent)}
+  .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent2));border:none;color:#0b0e1f;font-weight:600}
+  .score{font-size:.82rem;color:var(--mut)}
+  .score b{color:var(--ok)}
+  .tabs{display:flex;gap:.3rem;flex-wrap:wrap;padding:.5rem 1rem;background:var(--panel);border-bottom:1px solid var(--line)}
+  .tab{cursor:pointer;padding:.4rem .8rem;border-radius:8px 8px 0 0;font-size:.85rem;color:var(--mut);border:1px solid transparent}
+  .tab.active{background:var(--card);color:var(--accent);border-color:var(--line)}
+  .progress{height:4px;background:var(--line);position:sticky;top:0}
+  .progress>div{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0;transition:width .2s}
+  main{max-width:820px;margin:0 auto;padding:1rem}
+  .qnav{display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem;color:var(--mut);font-size:.82rem}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:1rem 1.1rem}
+  .stem{font-size:1rem;margin:0 0 .9rem}
+  .options{display:grid;gap:.5rem}
+  .opt{border:1px solid var(--line);border-radius:8px;padding:.6rem .8rem;cursor:pointer;transition:.15s;font-size:.9rem}
+  .opt:hover{border-color:var(--accent)}
+  .opt.sel{border-color:var(--accent);background:rgba(124,147,255,.12)}
+  .opt.correct{border-color:var(--ok);background:rgba(74,222,128,.12)}
+  .opt.wrong{border-color:var(--bad);background:rgba(248,113,113,.12)}
+  .tf{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+  .tf .opt{text-align:center;font-weight:600}
+  .explain{margin-top:.8rem;font-size:.85rem;color:var(--mut);border-top:1px dashed var(--line);padding-top:.6rem;white-space:pre-line}
+  .explain .ok{color:var(--ok)} .explain .bad{color:var(--bad)}
+  .followups{margin-top:.6rem;padding:.6rem .7rem;background:rgba(176,124,255,.08);border:1px dashed var(--accent2);border-radius:8px;font-size:.84rem}
+  .blanks{font-size:1rem;line-height:2}
+  .slot{display:inline-block;min-width:90px;padding:.1rem .5rem;margin:0 .2rem;border:1.5px dashed var(--accent);border-radius:6px;text-align:center;color:var(--accent);min-height:1.6rem;vertical-align:middle}
+  .slot.filled{color:var(--txt);border-style:solid;background:rgba(124,147,255,.12)}
+  .slot.correct{border-color:var(--ok);color:var(--ok);background:rgba(74,222,128,.12)}
+  .slot.wrong{border-color:var(--bad);color:var(--bad);background:rgba(248,113,113,.12)}
+  .pool{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.8rem}
+  .chip{padding:.35rem .7rem;border:1px solid var(--line);border-radius:20px;cursor:grab;font-size:.85rem;background:var(--panel)}
+  .chip:hover{border-color:var(--accent)}
+  .chip.used{opacity:.3;cursor:default}
+  .overview{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:20;padding:1rem;overflow:auto}
+  .overview.open{display:block}
+  .ovPanel{max-width:820px;margin:2rem auto;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:1rem}
+  .ovFilter{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.8rem}
+  .ovGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:.5rem}
+  .ovItem{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:.5rem;cursor:pointer;font-size:.78rem}
+  .ovItem:hover{border-color:var(--accent)}
+  .ovItem.ok{border-color:var(--ok)} .ovItem.bad{border-color:var(--bad)} .ovItem.none{opacity:.6}
+  .ovNum{font-size:1.1rem;font-weight:700;margin-bottom:.2rem}
+  @media(max-width:560px){.tabs{padding-inline:.6rem}main{padding:.6rem}.card{padding:.8rem}}
+</style>
+</head>
+<body>
+
+<header>
+  <h1 id="hdrTitle">Interview Cards</h1>
+  <span class="score">Score: <b id="scoreVal">0</b>/<span id="scoreTot">0</span></span>
+  <button class="btn" onclick="openOverview()">Overview</button>
+  <button class="btn" onclick="reshuffleAll()">Reshuffle</button>
+  <button class="btn" onclick="resetAll()">Reset all</button>
+</header>
+
+<div class="tabs" id="tabs">
+  <div class="tab active" data-mode="drag" onclick="switchMode('drag')">Drag-fill</div>
+  <div class="tab" data-mode="single" onclick="switchMode('single')">Single</div>
+  <div class="tab" data-mode="multi" onclick="switchMode('multi')">Multi</div>
+  <div class="tab" data-mode="tf" onclick="switchMode('tf')">True/False</div>
+</div>
+<div class="progress"><div id="progBar"></div></div>
+
+<main>
+  <div class="qnav">
+    <button class="btn" onclick="prevQ()">&#9664; Prev</button>
+    <span id="qpos">- / -</span>
+    <button class="btn" onclick="nextQ()">Next &#9654;</button>
+  </div>
+  <div class="card" id="qcard"></div>
+</main>
+
+<div class="overview" id="overview" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="ovPanel">
+    <h2 style="margin:0 0 .6rem;font-size:1.1rem">Overview</h2>
+    <div class="ovFilter">
+      <button class="btn" data-f="all" onclick="setOvFilter('all')">All</button>
+      <button class="btn" data-f="ok" onclick="setOvFilter('ok')">Correct</button>
+      <button class="btn" data-f="bad" onclick="setOvFilter('bad')">Wrong</button>
+      <button class="btn" data-f="none" onclick="setOvFilter('none')">Unanswered</button>
+    </div>
+    <div class="ovGrid" id="ovGrid"></div>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   DATA START  -- EDIT ONLY THIS BLOCK
+   ===================================================================== */
+const TITLE = "DSH Harness — 概念卡";
+const SUBTITLE = "Cordis · Loop · Session · Seam · Goal";
+
+const dragQuestions = [
+  {
+    stem: "dsh 的口号是 everything is a {0}；扩展插件依赖 {1}，永不直接依赖 {2}。",
+    answers: ["plugin", "dsh-agent", "dsh-agent-loop"],
+    pool: ["plugin", "dsh-agent", "dsh-agent-loop", "monolith", "dsh-llm", "kernel"],
+    perSlotExplanation: [
+      "没有特权内核；模型适配器、工具表、session log、loop 本身都是插件。",
+      "公开句柄是 Agent / ctx.agents，UI 和 hook 只编程这一面。",
+      "loop 是默认可替换 driver；依赖它会把扩展钉死在具体实现上。"
+    ]
+  },
+  {
+    stem: "一次 {0} 是一次模型请求加它调用的工具；一次 {1} 包含零或多个前者，直到没有未偿债务。",
+    answers: ["step", "turn"],
+    pool: ["step", "turn", "round", "session", "epoch"],
+    perSlotExplanation: [
+      "step = 一次 LLM 调用 + 该响应触发的 tool executions。",
+      "turn 打开于认领输入之前，关闭于不再欠工作；可以零 step（pre-step reject）。"
+    ]
+  },
+  {
+    stem: "goal 的 durable 阶段叫 {0}；本进程能否自动续跑叫 {1}，且 {2}。",
+    answers: ["phase", "activation", "never persisted"],
+    pool: ["phase", "activation", "never persisted", "status", "budget", "always persisted"],
+    perSlotExplanation: [
+      "phase: active / paused / blocked / complete，由 goal/change 折叠。",
+      "activation: armed | disarmed，只活在当前进程。",
+      "resume / fork / session-start 都会 disarm，即使 phase 仍是 active。"
+    ]
+  },
+  {
+    stem: "followup 会 {0}；steer 交给最近 step 并可唤醒；inject 只塞上下文并且 {1}。",
+    answers: ["wake the driver", "does not wake"],
+    pool: ["wake the driver", "does not wake", "opens a new session", "awaits the reply", "clears the inbox"],
+    perSlotExplanation: [
+      "followup 把普通消息排进 next-turn 并唤醒 driver。",
+      "inject 是上下文，idle 时一直等到别人唤醒；可能错过已经 claim 过的 pre-step。"
+    ]
+  },
+  {
+    stem: "capability seam 必须同时有 Service {0}、{1} 和 {2}；单独一个角色不是 seam。",
+    answers: ["Definition", "Provider", "Consumer"],
+    pool: ["Definition", "Provider", "Consumer", "Interface", "Adapter", "Facade"],
+    perSlotExplanation: [
+      "Definition 是 Cordis Service（抽象类或注册表），不是 TS interface。",
+      "Provider 实现能力（如 dsh-bash-local）。",
+      "Consumer 使用它，常见是模型可见工具（dsh-tool-bash）。"
+    ]
+  },
+  {
+    stem: "waterfall 监听器收到 (...args, next)。调用 {0} 才把结果交给下游；不调用则 {1}。",
+    answers: ["next()", "short-circuit"],
+    pool: ["next()", "short-circuit", "emit()", "retry", "throw"],
+    perSlotExplanation: [
+      "值通过 next() 的返回值向外传播，可再包装。",
+      "策略监听器可以故意短路；纯观察者必须委托，否则下游永远看不到事件。"
+    ]
+  }
+];
+
+const singleQuestions = [
+  {
+    stem: "session resume 或 fork 之后，一条 durable phase=active 的 goal 会怎样？",
+    options: [
+      "A. 自动 re-arm，idle 后立刻开下一 goal round",
+      "B. activation 被 disarm；必须显式 resume 才允许自动续跑",
+      "C. phase 变成 paused，round 计数清零",
+      "D. 目标被 clear，只留 tombstone"
+    ],
+    correct: 1,
+    optionExplanations: [
+      "错：那是 Codex restart 行为。dsh 认为进程边界后自动续跑危险。",
+      "对：activation 从不落盘。新鲜 cache 与每次 agent/session-start 都 disarm。",
+      "错：phase、revision、roundsStarted 都保留。",
+      "错：clear 是显式动词，resume/fork 不会清目标。"
+    ]
+  },
+  {
+    stem: "谁会消耗 maxGoalRounds？",
+    options: [
+      "A. 该 session 里每一个 turn，包括人类追问",
+      "B. 每一次 tool/call",
+      "C. 仅被承认进入的 goal-sourced user/message",
+      "D. 每一次 get_goal 调用"
+    ],
+    correct: 2,
+    optionExplanations: [
+      "错：人类 turn 明确不计入 cap。",
+      "错：工具调用属于 step，与 round 计数无关。",
+      "对：reservation 被拒不消耗编号；只有 entered user/message 推进 roundsStarted。",
+      "错：读目标不加 round。"
+    ]
+  },
+  {
+    stem: "模型在 goal round 里要 mark complete，正确门槛是？",
+    options: [
+      "A. 助手自己说「我觉得做完了」即可",
+      "B. 对照 workspace / tool results / durable state 取证，再 update_goal complete",
+      "C. 只要 round 数达到 maxGoalRounds 就自动 complete",
+      "D. 调用 concludeTurn() 即视为完成"
+    ],
+    correct: 1,
+    optionExplanations: [
+      "错：政策写明 never on the model's own say-so。",
+      "对：prompt 要求 inspect 权威状态；工具还要读当前 goal 再 mutation。",
+      "错：打到 cap 只是停止续跑，不会自动 complete。",
+      "错：concludeTurn 只停物理 turn，是 complete/blocked 成功后的副作用。"
+    ]
+  },
+  {
+    stem: "为什么新功能默认不改 agent-loop？",
+    options: [
+      "A. loop 没有公开 API",
+      "B. 新行为应挂文档化扩展点；改 loop 必须同步改 architecture.md",
+      "C. TypeScript 不允许改 loop",
+      "D. loop 运行在 worker thread，插件碰不到"
+    ],
+    correct: 1,
+    optionExplanations: [
+      "错：loop 实现公开 Agent 契约，只是扩展插件不该 import 它。",
+      "对：AGENTS.md / architecture.md 的硬规则。",
+      "错：编译器不拦，约定拦。",
+      "错：默认 loop 在同进程；workflow 引擎才上 worker thread。"
+    ]
+  },
+  {
+    stem: "「模型可见 ⟺ 已入账」意味着什么？",
+    options: [
+      "A. UI 卡片必须写入 session log",
+      "B. 任何进入模型请求的内容必须能从 session log 重建",
+      "C. 每个 tool result 都要再 inject 一遍",
+      "D. 只有 user/message 需要入账，assistant/chunk 可以丢"
+    ],
+    correct: 1,
+    optionExplanations: [
+      "错：command 输出可以是纯 UI 状态；domain 自己写耐久事件。",
+      "对：runtime invariant 断言这一点；新输入要扩 SessionEventMap。",
+      "错：多余 inject 会污染上下文。",
+      "错：raw chunk 保留 replay/UI 保真；assembled assistant/message 用于派生历史。"
+    ]
+  },
+  {
+    stem: "Agent.followup() 的返回值标识什么？",
+    options: [
+      "A. 最终 assistant 输出的 Promise",
+      "B. 该 turn 结束的句柄",
+      "C. 不返回可等待结果；MessageId 只标识 inbox 插入/认领/丢弃",
+      "D. whenIdle() 会绑定到这一条消息"
+    ],
+    correct: 2,
+    optionExplanations: [
+      "错：没有 per-message completion。",
+      "错：turn 结束是 session 事件，不是 followup 的返回。",
+      "对：core.md 写明 followup 不返回 handle。",
+      "错：whenIdle 观察整个 agent，多条消息可共享一个 running 区间。"
+    ]
+  },
+  {
+    stem: "Ralph loop 与 same-session goal 的本质差别？",
+    options: [
+      "A. Ralph 是 goal 的实现细节",
+      "B. Ralph 每 round 开全新 child（无 parent/prior 会话种子）；goal 在同一 session 续跑",
+      "C. 两者都改 agent-loop 的 mode 字段",
+      "D. Ralph 计量 token，goal 计量 wall-clock"
+    ],
+    correct: 1,
+    optionExplanations: [
+      "错：glossary 明确 Ralph 不是 same-session goal。",
+      "对：跨 round 记忆分别是「完整历史」vs「workspace + 有界 handoff」。",
+      "错：两者都是插件政策，不是 loop mode。",
+      "错：dsh goal 只计 round cap；Ralph 有自己的 round limit。"
+    ]
+  },
+  {
+    stem: "ctx.waterfall 监听器只想给 payload 加注释，正确写法是？",
+    options: [
+      "A. 改完直接 return payload，不调 next()",
+      "B. mutate 后必须调用 next() 把链交给下游",
+      "C. 改用 ctx.emit，waterfall 不能观察",
+      "D. throw 让 dispatcher 重试"
+    ],
+    correct: 1,
+    optionExplanations: [
+      "错：不调 next 会短路，下游策略永远看不到。",
+      "对：观察/注解型监听器必须委托；短路只留给拥有决策的策略。",
+      "错：waterfall 就是环绕中间件。",
+      "错：异常应被包含，不是控制流。"
+    ]
+  }
+];
+
+const multiQuestions = [
+  {
+    stem: "下列哪些是 Cordis / dsh 的真实约束？（多选）",
+    options: [
+      "注册必须通过 ctx.effect() / ctx.on()，unload 时撤回",
+      "函数插件不要再 default-export，否则 Loader 丢掉 named namespace",
+      "可选服务用 ctx.get(name)，不要默认走属性代理",
+      "waterfall 一律禁止短路",
+      "每个包要有 ./invariant companion",
+      "改 agent-loop 可以不改文档，只要测试绿"
+    ],
+    correct: [0, 1, 2, 4],
+    optionExplanations: [
+      "对：Registrations are effects。",
+      "对：postmortem 0001。",
+      "对：属性代理拓扑敏感。",
+      "错：策略短路是设计。",
+      "对：空 installer 也要解释 No runtime invariant。",
+      "错：改 loop 必须更新 architecture.md。"
+    ]
+  },
+  {
+    stem: "哪些事件是耐久 session 事实（会进 log）？（多选）",
+    options: [
+      "turn/start、turn/end",
+      "user/message、assistant/message、tool/call、tool/result",
+      "agent/pre-step 的返回值本身",
+      "goal/change",
+      "assistant/chunk",
+      "goal/changed（live emit）"
+    ],
+    correct: [0, 1, 3, 4],
+    optionExplanations: [
+      "对：turn 边界是 session 事件。",
+      "对：模型可见对话面。",
+      "错：pre-step 是 live waterfall；entered 消息随后才写成 user/message。",
+      "对：goal domain 的权威突变。",
+      "对：token 级 replay 保真。",
+      "错：goal/changed 是 mutation 提交后的 live 通知，失败被 contained。"
+    ]
+  },
+  {
+    stem: "一条 goal 在哪些情况下会 disarm（不改 phase）？（多选）",
+    options: [
+      "agent/session-start（含 resume/fork）",
+      "goal-round-driver 卸载前",
+      "sessions.flush 失败经 agent/error",
+      "成功 complete",
+      "人类 /goal resume",
+      "driver 在无关取消后的 idle checkpoint"
+    ],
+    correct: [0, 1, 2, 5],
+    optionExplanations: [
+      "对：激活从不继承到新进程/新生命周期。",
+      "对：生命周期 owner 在卸 driver 前 disarm。",
+      "对：耐久不确定则不许再开 round。",
+      "错：complete 会改 phase 并 disarm，不是「只 disarm」。",
+      "错：resume 是 re-arm。",
+      "对：无关取消只 disarm；与 goal 尝试相关的取消会尝试 pause。"
+    ]
+  },
+  {
+    stem: "模型调用 create_goal / update_goal 时，哪些权限检查为真？（多选）",
+    options: [
+      "必须是 registry 里那份精确 live Agent 且 status=running",
+      "必须 ctx.agents.currentInitiator() === agent",
+      "create/edit/pause/resume 需要 runtime-root 上 source.kind=user 的已接受消息",
+      "subagent 只要 lineage 来自 root 就能 create_goal",
+      "complete/blocked 接受当前精确 goal round 或直接人类",
+      "省略 source 的 Agent.followup() 会默认成 user，非人类生产者必须自带 source"
+    ],
+    correct: [0, 1, 2, 4, 5],
+    optionExplanations: [
+      "对：authority.ts 的身份三联。",
+      "对：必须在自己的 active driver 里。",
+      "对：host 对人类输入的证明。",
+      "错：活 subagent 所有权会降权；durable fork lineage 不降权 resumed root。",
+      "对：autonomous 路径要 round 匹配。",
+      "对：否则调度器会偷到人类权限。"
+    ]
+  },
+  {
+    stem: "capability seam 的正确说法？（多选）",
+    options: [
+      "三角色齐全才叫 seam",
+      "Definition 必须是 TypeScript interface",
+      "shell 范本：dsh-shell + bash-local + tool-bash",
+      "换 FS/subprocess provider 可以让 Bash/PTY/LSP 一起走远程 sandbox",
+      "subagent 同一 context 只允许一个 provider",
+      "扩展插件依赖 Definition，不依赖具体 Provider"
+    ],
+    correct: [0, 2, 3, 5],
+    optionExplanations: [
+      "对：glossary。",
+      "错：必须是 Cordis Service 抽象类或注册表。",
+      "对：packages/shell。",
+      "对：architecture.md 的「一个 provider swap 改整条产品」。",
+      "错：subagent 是 named 多 provider，像 LLM registry。",
+      "对：packages/README 硬规则。"
+    ]
+  },
+  {
+    stem: "dsh 测试政策里哪些是真的？（多选）",
+    options: [
+      "CI coverage 门是 packages/*/*/src 逐文件 100%",
+      "产品可见插件必须有真实 Loader 组合测试",
+      "手搓 ctx.plugin(...) 足以替代组合测试",
+      "模型/协议/人类可见变化要加 keyless snapshot",
+      "e2e 应断言外部世界（重读文件），不信模型自报",
+      "无 DEEPSEEK_API_KEY 时 e2e 应硬失败"
+    ],
+    correct: [0, 1, 3, 4],
+    optionExplanations: [
+      "对：test:coverage 才是门。",
+      "对：boot test-only cordis.yml。",
+      "错：明确不够。",
+      "对：包测/e2e/mock 不能替代组装转录。",
+      "对：verify the world。",
+      "错：无 key 自跳过，让 secretless CI 保持绿。"
+    ]
+  }
+];
+
+const trueFalseQuestions = [
+  {
+    stem: "Goal 是一个调度器：idle 后若上一 turn 失败，会自动重试。",
+    correct: false,
+    explanation:
+      "常见误区：把「粘住目标」当成 retry queue。\n正确：dsh-goal 是状态，不是调度器。driver 只在 idle+armed+有容量时开下一 round；provider/持久化失败需要人类 resume，没有异常自动重试。",
+    followUps: [
+      "Q: 那谁决定何时续跑？ -> dsh-goal-round-driver，独立插件。",
+      "Q: 取消后会不会自己再开？ -> 与 goal 尝试相关的取消会 pause；pause 失败则 disarm。"
+    ]
+  },
+  {
+    stem: "Session resume 之后，active goal 会像 Codex 一样自动 re-arm idle loop。",
+    correct: false,
+    explanation:
+      "常见误区：把 Codex restart 合同套到 dsh。\n正确：activation 从不落盘。resume/fork/session-start 一律 disarm，必须 /goal resume 或 update_goal action resume。",
+    followUps: [
+      "Q: 为什么？ -> 进程边界后自动续跑可能在错误世界里烧 round。",
+      "Q: phase 丢了吗？ -> 没有。objective/phase/revision/roundsStarted 都还在。"
+    ]
+  },
+  {
+    stem: "dsh goal 有 Codex 同款 BudgetLimited：token 超额会自动转终态。",
+    correct: false,
+    explanation:
+      "常见误区：对照表一对一映射状态机。\n正确：dsh 只有 round cap（maxGoalRounds）。token/货币/墙钟/供应商配额是独立政策，不映射成 goal blocker code。",
+    followUps: [
+      "Q: 打到 cap 发生什么？ -> 不再续跑；不会自动 complete。",
+      "Q: blocked 干什么用？ -> 所有「被问题停住」共用一个 durable phase + code/message。"
+    ]
+  },
+  {
+    stem: "scoped 工具会自动出现在该 agent 的 subagent 里。",
+    correct: false,
+    explanation:
+      "常见误区：把 scope 当成树状继承。\n正确：scope 扁平两级，不向子代理继承。子树用 lineage 数据（parentSession、delegationDepth）。",
+    followUps: [
+      "Q: 那子代理怎么拿到工具？ -> 在它自己的 setup/scope 里注册，或用 global。",
+      "Q: restrict 呢？ -> 先滤 global 再 merge scope-local；被滤掉的等同不存在。"
+    ]
+  },
+  {
+    stem: "waterfall 监听器必须永远调用 next()。",
+    correct: false,
+    explanation:
+      "常见误区：把「必须委托」当成绝对。\n正确：观察/注解必须 next()；拥有决策的策略监听器可以短路（pre-step reject、pre-execute deny）。",
+    followUps: [
+      "Q: agent/turn-stopping 呢？ -> serial，没有 next()。",
+      "Q: 包装 next() 时要注意什么？ -> 返回的 enter(messages) 是权威的，除非故意替换应保留下游。"
+    ]
+  },
+  {
+    stem: "任何进入模型请求的内容都必须能从 session log 重建。",
+    correct: true,
+    explanation:
+      "这是 harness 的中轴不变量：model-visible ⟺ logged。新的模型可见输入必须扩 SessionEventMap 并从 log 渲染。",
+    followUps: [
+      "Q: inject 怎么满足？ -> 进入请求前会成为 user/message（source 标明 inject）。",
+      "Q: /goal 状态输出呢？ -> 命令文本不进模型；耐久突变写 goal/change。"
+    ]
+  },
+  {
+    stem: "whenIdle() 可以当作「这条 followup 已经得到助手回复」的 Future。",
+    correct: false,
+    explanation:
+      "常见误区：把 agent 级静止当成消息级完成。\n正确：若干 followup/steer/inject 可共享一个 running；取消可能丢掉未开始项。调用方必须自己定义拥有区间。",
+    followUps: [
+      "Q: MessageId 标识什么？ -> inbox 插入/认领/丢弃，不是结果。",
+      "Q: 如何测续跑循环？ -> 对状态转移事件断言，不必看模型真跑。"
+    ]
+  },
+  {
+    stem: "人类输入 /goal pause after verification 会暂停当前目标。",
+    correct: false,
+    explanation:
+      "常见误区：把首词当 subcommand。\n正确：控制词仅当占据完整输入时生效。该字符串会创建字面 objective「pause after verification」。未完成目标也不会被裸 /goal <obj> 替换。",
+    followUps: [
+      "Q: 怎么 pause？ -> 恰好 /goal pause。",
+      "Q: 命令输出进 log 吗？ -> 否，UI 状态；domain 自己写 goal/change。"
+    ]
+  },
+  {
+    stem: "产品可见插件用手搓 ctx.plugin(...) 测绿就够了。",
+    correct: false,
+    explanation:
+      "常见误区：单元组合 = 装船组合。\n正确：必须经 Loader 启动 test-only cordis.yml，并断言模型可见请求/log、耐久状态或用户可见输出。",
+    followUps: [
+      "Q: snapshot 何时必须？ -> 非平凡的模型/协议/人类可见变化，同一 PR。",
+      "Q: coverage 100% 够不够？ -> 必要不充分：只证明行跑过。"
+    ]
+  },
+  {
+    stem: "同一 session 里人类追问会消耗 goal round cap。",
+    correct: false,
+    explanation:
+      "常见误区：round = turn。\n正确：round 是政策计数器。只有 admitted goal-sourced user/message 推进 roundsStarted；无关人类 turn 不计入。",
+    followUps: [
+      "Q: 人类消息和自动 prompt 同时在 inbox？ -> 自动工作让路；混合 batch 里的自动 prompt 被拒后重预留。",
+      "Q: 预留过期？ -> 不消耗编号。"
+    ]
+  }
+];
+/* =====================================================================
+   DATA END  -- DO NOT EDIT BELOW UNLESS YOU KNOW THE TEMPLATE
+   ===================================================================== */
+
+const _origDrag   = JSON.parse(JSON.stringify(dragQuestions));
+const _origSingle = JSON.parse(JSON.stringify(singleQuestions));
+const _origMulti  = JSON.parse(JSON.stringify(multiQuestions));
+const _origTF     = JSON.parse(JSON.stringify(trueFalseQuestions));
+
+const MODES = ["drag","single","multi","tf"];
+let mode = "drag";
+let idx = { drag:0, single:0, multi:0, tf:0 };
+let sel = { drag:{}, single:{}, multi:{}, tf:{} };
+let checked = { drag:{}, single:{}, multi:{}, tf:{} };
+let ovFilter = "all";
+
+const LS_KEY = "interview-cards-" + TITLE;
+
+function shuffleArray(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+function shuffleOptions(q){
+  const ind=q.options.map((_,i)=>i);
+  const sh=shuffleArray(ind);
+  const newOptions=sh.map(i=>q.options[i]);
+  const newExpl=sh.map(i=>(q.optionExplanations||[])[i]||"");
+  const newCorrect=Array.isArray(q.correct)
+    ? q.correct.map(o=>sh.indexOf(o)).filter(i=>i>=0).sort((a,b)=>a-b)
+    : sh.indexOf(q.correct);
+  return {...q, options:newOptions, optionExplanations:newExpl, correct:newCorrect};
+}
+function questionsFor(m){ return m==="drag"?dragQuestions:m==="single"?singleQuestions:m==="multi"?multiQuestions:trueFalseQuestions; }
+function curArr(){ return questionsFor(mode); }
+function curQ(){ const a=curArr(); return a[idx[mode]]||null; }
+
+function save(){ try{ localStorage.setItem(LS_KEY, JSON.stringify({sel,checked,idx})); }catch(e){} }
+function load(){ try{ const r=JSON.parse(localStorage.getItem(LS_KEY)); if(r){sel=r.sel||sel;checked=r.checked||checked;idx=r.idx||idx;} }catch(e){} }
+
+function updateScore(){
+  let got=0, tot=0;
+  MODES.forEach(m=>{
+    const qs=questionsFor(m); tot+=qs.length;
+    qs.forEach((_,i)=>{ if(checked[m][i]){ got += isCorrect(m,i)?1:0; } });
+  });
+  document.getElementById("scoreVal").textContent=got;
+  document.getElementById("scoreTot").textContent=tot;
+  const pos=(idx[mode]+1)||0, len=curArr().length;
+  document.getElementById("qpos").textContent= len?`${pos} / ${len}`:"- / -";
+  document.getElementById("progBar").style.width= len?`${(pos/len)*100}%`:"0";
+}
+function isCorrect(m,i){
+  const qs=questionsFor(m), q=qs[i]; if(!q) return false;
+  if(m==="drag"){
+    const s=sel[m][i]||{}; return q.answers.every((a,k)=>s[k]===a);
+  }
+  if(m==="tf"){ return sel[m][i]===q.correct; }
+  const s=sel[m][i]||[]; const c=q.correct;
+  if(!Array.isArray(c)) return s[0]===c;
+  if(s.length!==c.length) return false;
+  return c.every(x=>s.includes(x));
+}
+
+function render(){
+  const card=document.getElementById("qcard"); card.innerHTML="";
+  const q=curQ(); if(!q){ card.innerHTML="<p>No questions in this section.</p>"; updateScore(); return; }
+  if(mode==="drag") renderDrag(card,q); else if(mode==="single") renderChoice(card,q,false); else if(mode==="multi") renderChoice(card,q,true); else renderTF(card,q);
+  updateScore(); save();
+}
+
+function renderDrag(card,q){
+  const gi=idx.drag, isChecked=checked.drag[gi], s=sel.drag[gi]||{};
+  const parts=q.stem.split(/\{(\d+)\}/g);
+  let stemHtml=""; for(let k=0;k<parts.length;k++){ if(k%2===0){stemHtml+=escapeHtml(parts[k]);} else {const slot=+parts[k]; const val=s[slot]; const cls=val?("slot filled"+(isChecked?(val===q.answers[slot]?" correct":" wrong"):"")):"slot"; stemHtml+=`<span class="${cls}" data-slot="${slot}" onclick="unsetSlot(${slot})">${escapeHtml(val||"?")}</span>`;} }
+  const cardEl=card; cardEl.innerHTML=`<p class="stem">${stemHtml}</p>`;
+  const pool=document.createElement("div"); pool.className="pool";
+  const usedSlots=Object.values(s);
+  q.pool.forEach(term=>{
+    const used=usedSlots.includes(term);
+    const chip=document.createElement("div");
+    chip.className="chip"+(used?" used":"");
+    chip.draggable=!used && !isChecked;
+    chip.textContent=term;
+    chip.dataset.term=term;
+    if(!used && !isChecked){
+      chip.ondragstart=e=>e.dataTransfer.setData("text",term);
+      chip.onclick=()=>fillNextEmpty(term);
+    }
+    pool.appendChild(chip);
+  });
+  cardEl.appendChild(pool);
+  if(isChecked){
+    const ex=document.createElement("div"); ex.className="explain";
+    q.answers.forEach((a,k)=>{ ex.innerHTML+=`<span class="${s[k]===a?'ok':'bad'}">Slot ${k+1}: ${s[k]===a?'correct':'wrong (expected '+a+')'}</span> - ${(q.perSlotExplanation||[])[k]||''}<br>`; });
+    cardEl.appendChild(ex);
+  }
+  addCheckReset(cardEl, ()=>!Object.keys(s).length, ()=>{ checked.drag[gi]=true; render(); }, ()=>{ delete sel.drag[gi]; delete checked.drag[gi]; render(); });
+}
+function fillNextEmpty(term){
+  if(checked.drag[idx.drag]) return;
+  const q=curQ(); const s=sel.drag[idx.drag]||(sel.drag[idx.drag]={});
+  for(let k=0;k<q.answers.length;k++){ if(s[k]===undefined){ s[k]=term; render(); return; } }
+}
+function unsetSlot(slot){
+  if(checked.drag[idx.drag]) return;
+  const s=sel.drag[idx.drag]; if(s){ delete s[slot]; render(); }
+}
+
+function renderChoice(card,q,isMulti){
+  const gi=idx[mode], isChecked=checked[mode][gi], s=sel[mode][gi]||(sel[mode][gi]=[]);
+  const stem=document.createElement("p"); stem.className="stem"; stem.textContent=q.stem; card.appendChild(stem);
+  const wrap=document.createElement("div"); wrap.className="options";
+  q.options.forEach((opt,i)=>{
+    const selNow=isMulti?s.includes(i):(s[0]===i);
+    let cls="opt"; if(!isChecked&&selNow) cls+=" sel";
+    if(isChecked){
+      const corr=Array.isArray(q.correct)?q.correct.includes(i):(q.correct===i);
+      if(corr) cls+=" correct"; else if(selNow) cls+=" wrong";
+    }
+    const el=document.createElement("div"); el.className=cls; el.textContent=opt;
+    if(!isChecked) el.onclick=()=>toggleChoice(i,isMulti);
+    wrap.appendChild(el);
+  });
+  card.appendChild(wrap);
+  if(isChecked){
+    const ex=document.createElement("div"); ex.className="explain";
+    q.options.forEach((opt,i)=>{
+      const corr=Array.isArray(q.correct)?q.correct.includes(i):(q.correct===i);
+      ex.innerHTML+=`<span class="${corr?'ok':'bad'}">${corr?'[+]':'[x]'} ${escapeHtml(opt)}</span> - ${(q.optionExplanations||[])[i]||''}<br>`;
+    });
+    if(q.followUps) ex.appendChild(buildFollowups(q.followUps));
+    card.appendChild(ex);
+  }
+  addCheckReset(card, ()=>isMulti? !s.length : s.length===0, ()=>{ checked[mode][gi]=true; render(); }, ()=>{ sel[mode][gi]=[]; delete checked[mode][gi]; render(); });
+}
+function toggleChoice(i,isMulti){
+  if(checked[mode][idx[mode]]) return;
+  const s=sel[mode][idx[mode]]||(sel[mode][idx[mode]]=[]);
+  if(isMulti){ const p=s.indexOf(i); if(p>=0) s.splice(p,1); else s.push(i); }
+  else { s[0]=i; }
+  render();
+}
+
+function renderTF(card,q){
+  const gi=idx.tf, isChecked=checked.tf[gi], s=sel.tf[gi];
+  const stem=document.createElement("p"); stem.className="stem"; stem.textContent=q.stem; card.appendChild(stem);
+  const wrap=document.createElement("div"); wrap.className="options tf";
+  [{l:"True",v:true},{l:"False",v:false}].forEach(o=>{
+    let cls="opt"; if(!isChecked&&s===o.v) cls+=" sel";
+    if(isChecked){ const corr=q.correct===o.v; if(corr) cls+=" correct"; else if(s===o.v) cls+=" wrong"; }
+    const el=document.createElement("div"); el.className=cls; el.textContent=o.l;
+    if(!isChecked) el.onclick=()=>{ sel.tf[gi]=o.v; render(); };
+    wrap.appendChild(el);
+  });
+  card.appendChild(wrap);
+  if(isChecked){
+    const ex=document.createElement("div"); ex.className="explain";
+    ex.innerHTML=`<span class="${s===q.correct?'ok':'bad'}">${s===q.correct?'Correct':'Wrong'}</span><br>${escapeHtml(q.explanation||'')}`;
+    if(q.followUps) ex.appendChild(buildFollowups(q.followUps));
+    card.appendChild(ex);
+  }
+  addCheckReset(card, ()=>s===undefined, ()=>{ checked.tf[gi]=true; render(); }, ()=>{ delete sel.tf[gi]; delete checked.tf[gi]; render(); });
+}
+function buildFollowups(list){
+  const w=document.createElement("div"); w.className="followups";
+  w.innerHTML="<b>Interviewer follow-ups:</b><br>"+list.map(f=>escapeHtml(f)).join("<br>");
+  return w;
+}
+function addCheckReset(card, noSelFn, checkFn, resetFn){
+  const row=document.createElement("div"); row.style.cssText="margin-top:.8rem;display:flex;gap:.5rem";
+  const ck=document.createElement("button"); ck.className="btn primary"; ck.textContent="Check answer";
+  ck.disabled=noSelFn(); ck.onclick=checkFn;
+  if(ck.disabled) ck.style.opacity=".5";
+  const rs=document.createElement("button"); rs.className="btn"; rs.textContent="Reset"; rs.onclick=resetFn;
+  row.appendChild(ck); row.appendChild(rs); card.appendChild(row);
+}
+
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function switchMode(m){ mode=m; document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.mode===m)); render(); }
+function nextQ(){ const a=curArr(); if(a.length) idx[mode]=(idx[mode]+1)%a.length; render(); }
+function prevQ(){ const a=curArr(); if(a.length) idx[mode]=(idx[mode]-1+a.length)%a.length; render(); }
+
+function openOverview(){ renderOverview(); document.getElementById("overview").classList.add("open"); }
+function setOvFilter(f){ ovFilter=f; renderOverview(); }
+function renderOverview(){
+  document.querySelectorAll(".ovFilter .btn").forEach(b=>b.classList.toggle("primary",b.dataset.f===ovFilter));
+  const grid=document.getElementById("ovGrid"); grid.innerHTML="";
+  let n=0;
+  MODES.forEach(m=>{
+    const qs=questionsFor(m);
+    qs.forEach((q,i)=>{
+      n++; const ok=checked[m][i]&&isCorrect(m,i); const bad=checked[m][i]&&!isCorrect(m,i); const none=!checked[m][i];
+      if(ovFilter!=="all"){ if(ovFilter==="ok"&&!ok) return; if(ovFilter==="bad"&&!bad) return; if(ovFilter==="none"&&!none) return; }
+      const el=document.createElement("div"); el.className="ovItem"+(ok?" ok":bad?" bad":" none");
+      el.innerHTML=`<div class="ovNum">${n}</div><div>${m} #${i+1}</div><div style="color:var(--mut);font-size:.72rem">${ok?'correct':bad?'wrong':'unanswered'}</div>`;
+      el.onclick=()=>{ mode=m; idx[m]=i; document.getElementById("overview").classList.remove("open"); switchMode(m); };
+      grid.appendChild(el);
+    });
+  });
+  if(!grid.children.length) grid.innerHTML="<p style='color:var(--mut)'>No items in this filter.</p>";
+}
+
+function resetAll(){ sel={drag:{},single:{},multi:{},tf:{}}; checked={drag:{},single:{},multi:{},tf:{}}; render(); }
+function reshuffleAll(){
+  resetAll();
+  const nd=shuffleArray(_origDrag), ns=shuffleArray(_origSingle).map(shuffleOptions), nm=shuffleArray(_origMulti).map(shuffleOptions), nt=shuffleArray(_origTF);
+  dragQuestions.length=0; dragQuestions.push(...nd);
+  singleQuestions.length=0; singleQuestions.push(...ns);
+  multiQuestions.length=0; multiQuestions.push(...nm);
+  trueFalseQuestions.length=0; trueFalseQuestions.push(...nt);
+  idx={drag:0,single:0,multi:0,tf:0};
+  switchMode(mode);
+}
+
+document.addEventListener("keydown",e=>{
+  if(e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA") return;
+  if(e.key==="ArrowRight") nextQ();
+  else if(e.key==="ArrowLeft") prevQ();
+});
+
+(function init(){
+  document.getElementById("hdrTitle").textContent=TITLE;
+  if(!dragQuestions.length){ document.querySelector('.tab[data-mode="drag"]').style.display="none"; if(mode==="drag") mode="single"; }
+  load(); switchMode(mode);
+})();
+</script>
+</body>
+</html>

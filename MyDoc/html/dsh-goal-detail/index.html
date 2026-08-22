@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>dsh-goal 深挖面试卡</title>
+<style>
+  :root{
+    --bg:#0f1226; --panel:#171a33; --card:#1e2342; --line:#2c3257;
+    --txt:#e8eaf6; --mut:#9aa0c0; --ok:#4ade80; --bad:#f87171; --warn:#fbbf24;
+    --accent:#7c93ff; --accent2:#b07cff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--txt);line-height:1.5}
+  header{position:sticky;top:0;z-index:10;background:linear-gradient(90deg,var(--panel),var(--card));border-bottom:1px solid var(--line);padding:.7rem 1rem;display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+  header h1{font-size:1.05rem;margin:0;margin-right:auto;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .btn{cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--txt);border-radius:8px;padding:.4rem .7rem;font-size:.82rem}
+  .btn:hover{border-color:var(--accent)}
+  .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent2));border:none;color:#0b0e1f;font-weight:600}
+  .score{font-size:.82rem;color:var(--mut)}
+  .score b{color:var(--ok)}
+  .tabs{display:flex;gap:.3rem;flex-wrap:wrap;padding:.5rem 1rem;background:var(--panel);border-bottom:1px solid var(--line)}
+  .tab{cursor:pointer;padding:.4rem .8rem;border-radius:8px 8px 0 0;font-size:.85rem;color:var(--mut);border:1px solid transparent}
+  .tab.active{background:var(--card);color:var(--accent);border-color:var(--line)}
+  .progress{height:4px;background:var(--line);position:sticky;top:0}
+  .progress>div{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0;transition:width .2s}
+  main{max-width:820px;margin:0 auto;padding:1rem}
+  .qnav{display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem;color:var(--mut);font-size:.82rem}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:1rem 1.1rem}
+  .stem{font-size:1rem;margin:0 0 .9rem}
+  .options{display:grid;gap:.5rem}
+  .opt{border:1px solid var(--line);border-radius:8px;padding:.6rem .8rem;cursor:pointer;transition:.15s;font-size:.9rem}
+  .opt:hover{border-color:var(--accent)}
+  .opt.sel{border-color:var(--accent);background:rgba(124,147,255,.12)}
+  .opt.correct{border-color:var(--ok);background:rgba(74,222,128,.12)}
+  .opt.wrong{border-color:var(--bad);background:rgba(248,113,113,.12)}
+  .tf{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+  .tf .opt{text-align:center;font-weight:600}
+  .explain{margin-top:.8rem;font-size:.85rem;color:var(--mut);border-top:1px dashed var(--line);padding-top:.6rem;white-space:pre-line}
+  .explain .ok{color:var(--ok)} .explain .bad{color:var(--bad)}
+  .followups{margin-top:.6rem;padding:.6rem .7rem;background:rgba(176,124,255,.08);border:1px dashed var(--accent2);border-radius:8px;font-size:.84rem}
+  /* drag-fill */
+  .blanks{font-size:1rem;line-height:2}
+  .slot{display:inline-block;min-width:90px;padding:.1rem .5rem;margin:0 .2rem;border:1.5px dashed var(--accent);border-radius:6px;text-align:center;color:var(--accent);min-height:1.6rem;vertical-align:middle}
+  .slot.filled{color:var(--txt);border-style:solid;background:rgba(124,147,255,.12)}
+  .slot.correct{border-color:var(--ok);color:var(--ok);background:rgba(74,222,128,.12)}
+  .slot.wrong{border-color:var(--bad);color:var(--bad);background:rgba(248,113,113,.12)}
+  .pool{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.8rem}
+  .chip{padding:.35rem .7rem;border:1px solid var(--line);border-radius:20px;cursor:grab;font-size:.85rem;background:var(--panel)}
+  .chip:hover{border-color:var(--accent)}
+  .chip.used{opacity:.3;cursor:default}
+  .overview{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:20;padding:1rem;overflow:auto}
+  .overview.open{display:block}
+  .ovPanel{max-width:820px;margin:2rem auto;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:1rem}
+  .ovFilter{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.8rem}
+  .ovGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:.5rem}
+  .ovItem{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:.5rem;cursor:pointer;font-size:.78rem}
+  .ovItem:hover{border-color:var(--accent)}
+  .ovItem.ok{border-color:var(--ok)} .ovItem.bad{border-color:var(--bad)} .ovItem.none{opacity:.6}
+  .ovNum{font-size:1.1rem;font-weight:700;margin-bottom:.2rem}
+  @media(max-width:560px){.tabs{padding-inline:.6rem}main{padding:.6rem}.card{padding:.8rem}}
+</style>
+</head>
+<body>
+
+<header>
+  <h1 id="hdrTitle">Interview Cards</h1>
+  <span class="score">Score: <b id="scoreVal">0</b>/<span id="scoreTot">0</span></span>
+  <button class="btn" onclick="openOverview()">Overview</button>
+  <button class="btn" onclick="reshuffleAll()">Reshuffle</button>
+  <button class="btn" onclick="resetAll()">Reset all</button>
+</header>
+
+<div class="tabs" id="tabs">
+  <div class="tab active" data-mode="drag" onclick="switchMode('drag')">Drag-fill</div>
+  <div class="tab" data-mode="single" onclick="switchMode('single')">Single</div>
+  <div class="tab" data-mode="multi" onclick="switchMode('multi')">Multi</div>
+  <div class="tab" data-mode="tf" onclick="switchMode('tf')">True/False</div>
+</div>
+<div class="progress"><div id="progBar"></div></div>
+
+<main>
+  <div class="qnav">
+    <button class="btn" onclick="prevQ()">&#9664; Prev</button>
+    <span id="qpos">- / -</span>
+    <button class="btn" onclick="nextQ()">Next &#9654;</button>
+  </div>
+  <div class="card" id="qcard"></div>
+</main>
+
+<div class="overview" id="overview" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="ovPanel">
+    <h2 style="margin:0 0 .6rem;font-size:1.1rem">Overview</h2>
+    <div class="ovFilter">
+      <button class="btn" data-f="all" onclick="setOvFilter('all')">All</button>
+      <button class="btn" data-f="ok" onclick="setOvFilter('ok')">Correct</button>
+      <button class="btn" data-f="bad" onclick="setOvFilter('bad')">Wrong</button>
+      <button class="btn" data-f="none" onclick="setOvFilter('none')">Unanswered</button>
+    </div>
+    <div class="ovGrid" id="ovGrid"></div>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   DATA START  -- EDIT ONLY THIS BLOCK
+   ===================================================================== */
+const TITLE = "dsh-goal 深挖面试卡";
+const SUBTITLE = "源码 / 边界 / 追问 — 状态可回放，权限必须重授";
+
+const dragQuestions = [];
+
+const singleQuestions = [
+  {
+    stem: "validateSnapshotTransition 里，resume 在哪一种情况下会抛错？",
+    options: [
+      "A. 当前 phase 是 paused",
+      "B. 当前 phase 是 blocked",
+      "C. roundsStarted >= next.maxGoalRounds",
+      "D. 当前 activation 是 disarmed"
+    ],
+    correct: 2,
+    optionExplanations: [
+      "错：paused 可以 resume 到 active。",
+      "错：blocked 也可以 resume。",
+      "对：fold.ts 把「轮次用尽」和非法相变写在同一条 resume 校验里。activation 不进 fold。",
+      "错：activation 根本不在 snapshot 里，严格 fold 看不见它。"
+    ],
+    followUps: [
+      "Q: 服务层对 already active+armed 的 resume 呢？ -> GoalService.resume 另抛 GOAL_INVALID_TRANSITION。",
+      "Q: 轮次用尽怎么恢复？ -> 先 edit 提高 maxGoalRounds，再 resume。"
+    ]
+  },
+  {
+    stem: "isMatchingGoalRound 判定「当前 goal round」要同时匹配哪些字段？",
+    options: [
+      "A. 只要 source.kind === 'goal'",
+      "B. goalId + revision",
+      "C. goalId + revision + round === goal.roundsStarted",
+      "D. goalId + round，revision 可以落后一版"
+    ],
+    correct: 2,
+    optionExplanations: [
+      "错：任意 goal 消息不够。",
+      "错：缺 round。",
+      "对：authority.ts 三条全等，且 round 必须等于当前已 admit 的 roundsStarted。",
+      "错：revision 落后就是另一条 goal 视图，不能报终止。"
+    ],
+    followUps: [
+      "Q: 为什么 round 必须等于 roundsStarted？ -> 防止用上一轮的注入消息在新 revision 上 complete。"
+    ]
+  },
+  {
+    stem: "drive() 里 sessions.flush() 失败时 round-driver 做什么？",
+    options: [
+      "A. 指数退避重试三次",
+      "B. 记录 warn 并 disarm，不预留下一轮",
+      "C. 直接 block(queue-failed)",
+      "D. 忽略错误，继续 followup"
+    ],
+    correct: 1,
+    optionExplanations: [
+      "错：README 把异常自动重试列为 deferred work。",
+      "对：checkpoint 失败就 disarm；执行授权拿掉，phase 不变。",
+      "错：queue-failed 是 followup() 抛错且 goal 仍 active+armed 时的 block。",
+      "错：未落盘就续跑会丢真相。"
+    ],
+    followUps: [
+      "Q: 之后怎么再跑？ -> 人授权 resume。",
+      "Q: followup 失败呢？ -> 尝试 block(queue-failed)。"
+    ]
+  },
+  {
+    stem: "create() 时当前已有一条 paused 的 goal，会怎样？",
+    options: [
+      "A. 覆盖成新 goal",
+      "B. 抛 GOAL_ALREADY_EXISTS",
+      "C. 自动 clear 再 create",
+      "D. 把 paused 改成 complete 再替换"
+    ],
+    correct: 1,
+    optionExplanations: [
+      "错：只有 complete 允许被 create 替换。",
+      "对：index.ts：current.phase !== 'complete' 就 GOAL_ALREADY_EXISTS。",
+      "错：clear 必须显式。",
+      "错：不会偷偷 complete。"
+    ],
+    followUps: [
+      "Q: 命令行怎么换目标？ -> /goal clear 或等 complete 后再 /goal <objective>。"
+    ]
+  },
+  {
+    stem: "谁推进 roundsStarted？",
+    options: [
+      "A. 每次 update_goal",
+      "B. 每次 emit goal/changed",
+      "C. 被 admit 的、source.round > 0 的 goal user/message",
+      "D. drive() 预留的瞬间，无论有没有进 inbox"
+    ],
+    correct: 2,
+    optionExplanations: [
+      "错：mutation 不改 roundsStarted（fold 要求 preserve counters）。",
+      "错：goal/changed 是通知，不是计数。",
+      "对：docs/subsystems/goal.md：只有这些 admitted 事件推进计数；拒绝非正 round、缺口、过期 revision。",
+      "错：预留失败 / 被 discard 不应把计数写死。"
+    ],
+    followUps: [
+      "Q: round=0 的消息？ -> 不算自动续跑轮次。"
+    ]
+  },
+  {
+    stem: "applyGoalProjection 对非 goal/change 事件返回同一引用，是为了什么？",
+    options: [
+      "A. 省内存而已",
+      "B. 投影 registry 用 Object.is 判断「没变」，跳过下游",
+      "C. 好让 activation 跟着走",
+      "D. 为了和严格 fold 共用缓存"
+    ],
+    correct: 1,
+    optionExplanations: [
+      "错：主要不是省内存。",
+      "对：index.ts 注释：registry 的 Object.is gate（和 title/todos 同一姿势）。",
+      "错：投影不含 activation。",
+      "错：两套 fold 状态形状不同（Set vs 纯 JSON）。"
+    ],
+    followUps: [
+      "Q: 畸形 goal/change 呢？ -> decode 失败也返回同一引用，不炸投影循环。"
+    ]
+  }
+];
+
+const multiQuestions = [
+  {
+    stem: "goalToolExecution 会拒绝哪些调用？（多选）",
+    options: [
+      "exec.agent 为 undefined",
+      "ctx.agents.get(id) 不是这同一个对象",
+      "agent.status !== 'running'",
+      "currentInitiator() !== agent",
+      "最近一条边界是 turn/end（无开放 turn）",
+      "goal.activation === 'disarmed'"
+    ],
+    correct: [0, 1, 2, 3, 4],
+    optionExplanations: [
+      "对：GOAL_TOOL_AGENT_REQUIRED。",
+      "对：必须是 registry 里那份 live 实例。",
+      "对：必须 running。",
+      "对：必须是当前 driver 发起者。",
+      "对：openTurn 碰到 turn/end 直接拒。",
+      "错：activation 不在 authority.ts；那是调度层。"
+    ]
+  },
+  {
+    stem: "严格 fold 的 resume 允许从哪些 phase 进入 active？（多选）",
+    options: [
+      "active",
+      "paused",
+      "blocked",
+      "complete",
+      "（无 goal）",
+      "只要 roundsStarted < maxGoalRounds"
+    ],
+    correct: [0, 1, 2],
+    optionExplanations: [
+      "对：resumable 集合含 active（给 session-start 后的 rearm 用）。",
+      "对。",
+      "对。",
+      "错：complete 是终态。",
+      "错：resume 需要当前 snapshot。",
+      "错：余量是额外条件，不是 phase。"
+    ]
+  },
+  {
+    stem: "round-driver 在哪些时刻会 requestDrive？（多选）",
+    options: [
+      "agent/status 变为 idle",
+      "goal/changed（并先标 needsCheckpoint）",
+      "上一次 drive 任务 settle 且 requested 仍为 true",
+      "agent/error",
+      "插件 apply 时对已 live 的 agent 继承 armed",
+      "agent/inbox/inserted 插入了一条人类 nextTurn"
+    ],
+    correct: [0, 1, 2],
+    optionExplanations: [
+      "对：idle 是续跑入口。",
+      "对：先 flush 再复核。",
+      "对：requestDrive 串行化，settle 后再跑。",
+      "错：error 走 disarm，不续。",
+      "错：加载到已有 agent 上绝不继承 activation。",
+      "错：人类消息会 competingQueued，让路而不是续跑。"
+    ]
+  }
+];
+
+const trueFalseQuestions = [
+  {
+    stem: "持久 fork 谱系会降低已恢复 root agent 的 goal 工具权限。",
+    correct: false,
+    explanation:
+      "常见误解：fork 过就永远是「非 root」。\n正确：tool-goal README：持久 fork 谱系不降权；live 子代理所有权才降权。资格看当前是不是 runtime root + 当前轮次的 user 消息。",
+    followUps: [
+      "Q: 那 fork 后为什么不自动续跑？ -> 那是 activation=disarmed，不是 authority 降权。",
+      "Q: 测试里 resumed fork 当 runtime root 能 resume 吗？ -> 能，tool-goal.spec 有这条。"
+    ]
+  },
+  {
+    stem: "goal edit 可以顺便把 blockedReason 清掉，当作「修过了」。",
+    correct: false,
+    explanation:
+      "常见误解：edit 是万能补丁。\n正确：fold 规定 edit 不能改 phase 或 blockedReason；改目标文本 / 轮次上限而已。",
+    followUps: [
+      "Q: 那 blocked 怎么解除？ -> resume 回到 active。",
+      "Q: 空 edit？ -> GOAL_INVALID_EDIT，至少改一个字段。"
+    ]
+  },
+  {
+    stem: "needsCheckpoint 的 flush 失败后，driver 会在下一 tick 自动再 flush。",
+    correct: false,
+    explanation:
+      "常见误解：持久化失败可以悄悄重试。\n正确：warn + disarm + return。失败即停，等人 resume。",
+    followUps: [
+      "Q: 为什么不重试？ -> 未落盘的状态不能当续跑前提；乐观重试会 busy-loop。"
+    ]
+  },
+  {
+    stem: "一条非 goal 的用户消息插进 nextTurn 时，正在 queued 的 goal followup 会被标 stale。",
+    correct: true,
+    explanation:
+      "正确：inbox/inserted 若不是自己那条预留消息，就 competingQueued=true，queued attempt.stale=true。有人类消息时让路。",
+    followUps: [
+      "Q: idle 时若 attempt 仍 queued/claimed/cancelled 且 goal 仍 active+armed？ -> 会 pause 这条 goal，避免和人抢。"
+    ]
+  },
+  {
+    stem: "GoalId 用 branded string，运行时仍是 string，所以 JSON 里可以直接当普通字段比相等。",
+    correct: true,
+    explanation:
+      "正确：Branded 只在 TypeScript 边界防混用；运行时是 string。不要把它理解成运行时 opaque buffer。",
+    followUps: [
+      "Q: 那 branded 防的是什么？ -> 把 SessionId / GoalId / MessageId 互相传来传去。"
+    ]
+  },
+  {
+    stem: "complete 之后可以用 resume 把同一条 goal 救回来。",
+    correct: false,
+    explanation:
+      "常见误解：所有停态都能 resume。\n正确：resumable 只有 active / paused / blocked。complete 是终态；要新目标就 create（complete 允许被替换）或先 clear。",
+    followUps: [
+      "Q: /goal 在 complete 时提示什么？ -> /goal <objective>, /goal clear。"
+    ]
+  }
+];
+/* =====================================================================
+   DATA END  -- DO NOT EDIT BELOW UNLESS YOU KNOW THE TEMPLATE
+   ===================================================================== */
+
+/* keep read-only originals for reshuffle */
+const _origDrag   = JSON.parse(JSON.stringify(dragQuestions));
+const _origSingle = JSON.parse(JSON.stringify(singleQuestions));
+const _origMulti  = JSON.parse(JSON.stringify(multiQuestions));
+const _origTF     = JSON.parse(JSON.stringify(trueFalseQuestions));
+
+const MODES = ["drag","single","multi","tf"];
+let mode = "drag";
+let idx = { drag:0, single:0, multi:0, tf:0 };
+let sel = { drag:{}, single:{}, multi:{}, tf:{} }; // per-question selections
+let checked = { drag:{}, single:{}, multi:{}, tf:{} };
+let ovFilter = "all";
+
+const LS_KEY = "interview-cards-" + TITLE;
+
+function shuffleArray(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+function shuffleOptions(q){
+  const ind=q.options.map((_,i)=>i);
+  const sh=shuffleArray(ind);
+  const newOptions=sh.map(i=>q.options[i]);
+  const newExpl=sh.map(i=>(q.optionExplanations||[])[i]||"");
+  const newCorrect=Array.isArray(q.correct)
+    ? q.correct.map(o=>sh.indexOf(o)).filter(i=>i>=0).sort((a,b)=>a-b)
+    : sh.indexOf(q.correct);
+  return {...q, options:newOptions, optionExplanations:newExpl, correct:newCorrect};
+}
+function questionsFor(m){ return m==="drag"?dragQuestions:m==="single"?singleQuestions:m==="multi"?multiQuestions:trueFalseQuestions; }
+function curArr(){ return questionsFor(mode); }
+function curQ(){ const a=curArr(); return a[idx[mode]]||null; }
+
+function save(){ try{ localStorage.setItem(LS_KEY, JSON.stringify({sel,checked,idx})); }catch(e){} }
+function load(){ try{ const r=JSON.parse(localStorage.getItem(LS_KEY)); if(r){sel=r.sel||sel;checked=r.checked||checked;idx=r.idx||idx;} }catch(e){} }
+
+function updateScore(){
+  let got=0, tot=0;
+  MODES.forEach(m=>{
+    const qs=questionsFor(m); tot+=qs.length;
+    qs.forEach((_,i)=>{ if(checked[m][i]){ got += isCorrect(m,i)?1:0; } });
+  });
+  document.getElementById("scoreVal").textContent=got;
+  document.getElementById("scoreTot").textContent=tot;
+  const pos=(idx[mode]+1)||0, len=curArr().length;
+  document.getElementById("qpos").textContent= len?`${pos} / ${len}`:"- / -";
+  document.getElementById("progBar").style.width= len?`${(pos/len)*100}%`:"0";
+}
+function isCorrect(m,i){
+  const qs=questionsFor(m), q=qs[i]; if(!q) return false;
+  if(m==="drag"){
+    const s=sel[m][i]||{}; return q.answers.every((a,k)=>s[k]===a);
+  }
+  if(m==="tf"){ return sel[m][i]===q.correct; }
+  const s=sel[m][i]||[]; const c=q.correct;
+  if(!Array.isArray(c)) return s[0]===c;
+  if(s.length!==c.length) return false;
+  return c.every(x=>s.includes(x));
+}
+
+function render(){
+  const card=document.getElementById("qcard"); card.innerHTML="";
+  const q=curQ(); if(!q){ card.innerHTML="<p>No questions in this section.</p>"; updateScore(); return; }
+  if(mode==="drag") renderDrag(card,q); else if(mode==="single") renderChoice(card,q,false); else if(mode==="multi") renderChoice(card,q,true); else renderTF(card,q);
+  updateScore(); save();
+}
+
+function renderDrag(card,q){
+  const gi=idx.drag, isChecked=checked.drag[gi], s=sel.drag[gi]||{};
+  const parts=q.stem.split(/\{(\d+)\}/g);
+  let stemHtml=""; for(let k=0;k<parts.length;k++){ if(k%2===0){stemHtml+=escapeHtml(parts[k]);} else {const slot=+parts[k]; const val=s[slot]; const cls=val?("slot filled"+(isChecked?(val===q.answers[slot]?" correct":" wrong"):"")):"slot"; stemHtml+=`<span class="${cls}" data-slot="${slot}" onclick="unsetSlot(${slot})">${escapeHtml(val||"?")}</span>`;} }
+  const cardEl=card; cardEl.innerHTML=`<p class="stem">${stemHtml}</p>`;
+  const pool=document.createElement("div"); pool.className="pool";
+  const usedSlots=Object.values(s);
+  q.pool.forEach(term=>{
+    const used=usedSlots.includes(term);
+    const chip=document.createElement("div");
+    chip.className="chip"+(used?" used":"");
+    chip.draggable=!used && !isChecked;
+    chip.textContent=term;
+    chip.dataset.term=term;
+    if(!used && !isChecked){
+      chip.ondragstart=e=>e.dataTransfer.setData("text",term);
+      chip.onclick=()=>fillNextEmpty(term);
+    }
+    pool.appendChild(chip);
+  });
+  cardEl.appendChild(pool);
+  if(isChecked){
+    const ex=document.createElement("div"); ex.className="explain";
+    q.answers.forEach((a,k)=>{ ex.innerHTML+=`<span class="${s[k]===a?'ok':'bad'}">Slot ${k+1}: ${s[k]===a?'correct':'wrong (expected '+a+')'}</span> - ${(q.perSlotExplanation||[])[k]||''}<br>`; });
+    cardEl.appendChild(ex);
+  }
+  addCheckReset(cardEl, ()=>!Object.keys(s).length, ()=>{ checked.drag[gi]=true; render(); }, ()=>{ delete sel.drag[gi]; delete checked.drag[gi]; render(); });
+}
+function fillNextEmpty(term){
+  if(checked.drag[idx.drag]) return;
+  const q=curQ(); const s=sel.drag[idx.drag]||(sel.drag[idx.drag]={});
+  for(let k=0;k<q.answers.length;k++){ if(s[k]===undefined){ s[k]=term; render(); return; } }
+}
+function unsetSlot(slot){
+  if(checked.drag[idx.drag]) return;
+  const s=sel.drag[idx.drag]; if(s){ delete s[slot]; render(); }
+}
+function allowDrop(e){ e.preventDefault(); }
+function dropSlot(e,slot){
+  e.preventDefault(); if(checked.drag[idx.drag]) return;
+  const term=e.dataTransfer.getData("text"); if(!term) return;
+  const s=sel.drag[idx.drag]||(sel.drag[idx.drag]={}); s[slot]=term; render();
+}
+
+function renderChoice(card,q,isMulti){
+  const gi=idx[mode], isChecked=checked[mode][gi], s=sel[mode][gi]||(sel[mode][gi]=[]);
+  const stem=document.createElement("p"); stem.className="stem"; stem.textContent=q.stem; card.appendChild(stem);
+  const wrap=document.createElement("div"); wrap.className="options";
+  q.options.forEach((opt,i)=>{
+    const selNow=isMulti?s.includes(i):(s[0]===i);
+    let cls="opt"; if(!isChecked&&selNow) cls+=" sel";
+    if(isChecked){
+      const corr=Array.isArray(q.correct)?q.correct.includes(i):(q.correct===i);
+      if(corr) cls+=" correct"; else if(selNow) cls+=" wrong";
+    }
+    const el=document.createElement("div"); el.className=cls; el.textContent=opt;
+    if(!isChecked) el.onclick=()=>toggleChoice(i,isMulti);
+    wrap.appendChild(el);
+  });
+  card.appendChild(wrap);
+  if(isChecked){
+    const ex=document.createElement("div"); ex.className="explain";
+    q.options.forEach((opt,i)=>{
+      const corr=Array.isArray(q.correct)?q.correct.includes(i):(q.correct===i);
+      ex.innerHTML+=`<span class="${corr?'ok':'bad'}">${corr?'[+]':'[x]'} ${escapeHtml(opt)}</span> - ${(q.optionExplanations||[])[i]||''}<br>`;
+    });
+    if(q.followUps) ex.appendChild(buildFollowups(q.followUps));
+    card.appendChild(ex);
+  }
+  addCheckReset(card, ()=>isMulti? !s.length : s.length===0, ()=>{ checked[mode][gi]=true; render(); }, ()=>{ sel[mode][gi]=[]; delete checked[mode][gi]; render(); });
+}
+function toggleChoice(i,isMulti){
+  if(checked[mode][idx[mode]]) return;
+  const s=sel[mode][idx[mode]]||(sel[mode][idx[mode]]=[]);
+  if(isMulti){ const p=s.indexOf(i); if(p>=0) s.splice(p,1); else s.push(i); }
+  else { s[0]=i; }
+  render();
+}
+
+function renderTF(card,q){
+  const gi=idx.tf, isChecked=checked.tf[gi], s=sel.tf[gi];
+  const stem=document.createElement("p"); stem.className="stem"; stem.textContent=q.stem; card.appendChild(stem);
+  const wrap=document.createElement("div"); wrap.className="options tf";
+  [{l:"True",v:true},{l:"False",v:false}].forEach(o=>{
+    let cls="opt"; if(!isChecked&&s===o.v) cls+=" sel";
+    if(isChecked){ const corr=q.correct===o.v; if(corr) cls+=" correct"; else if(s===o.v) cls+=" wrong"; }
+    const el=document.createElement("div"); el.className=cls; el.textContent=o.l;
+    if(!isChecked) el.onclick=()=>{ sel.tf[gi]=o.v; render(); };
+    wrap.appendChild(el);
+  });
+  card.appendChild(wrap);
+  if(isChecked){
+    const ex=document.createElement("div"); ex.className="explain";
+    ex.innerHTML=`<span class="${s===q.correct?'ok':'bad'}">${s===q.correct?'Correct':'Wrong'}</span><br>${escapeHtml(q.explanation||'')}`;
+    if(q.followUps) ex.appendChild(buildFollowups(q.followUps));
+    card.appendChild(ex);
+  }
+  addCheckReset(card, ()=>s===undefined, ()=>{ checked.tf[gi]=true; render(); }, ()=>{ delete sel.tf[gi]; delete checked.tf[gi]; render(); });
+}
+function buildFollowups(list){
+  const w=document.createElement("div"); w.className="followups";
+  w.innerHTML="<b>Interviewer follow-ups:</b><br>"+list.map(f=>escapeHtml(f)).join("<br>");
+  return w;
+}
+function addCheckReset(card, noSelFn, checkFn, resetFn){
+  const row=document.createElement("div"); row.style.cssText="margin-top:.8rem;display:flex;gap:.5rem";
+  const ck=document.createElement("button"); ck.className="btn primary"; ck.textContent="Check answer";
+  ck.disabled=noSelFn(); ck.onclick=checkFn;
+  if(ck.disabled) ck.style.opacity=".5";
+  const rs=document.createElement("button"); rs.className="btn"; rs.textContent="Reset"; rs.onclick=resetFn;
+  row.appendChild(ck); row.appendChild(rs); card.appendChild(row);
+}
+
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function switchMode(m){ mode=m; document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.mode===m)); render(); }
+function nextQ(){ const a=curArr(); if(a.length) idx[mode]=(idx[mode]+1)%a.length; render(); }
+function prevQ(){ const a=curArr(); if(a.length) idx[mode]=(idx[mode]-1+a.length)%a.length; render(); }
+
+function openOverview(){ renderOverview(); document.getElementById("overview").classList.add("open"); }
+function setOvFilter(f){ ovFilter=f; renderOverview(); }
+function renderOverview(){
+  document.querySelectorAll(".ovFilter .btn").forEach(b=>b.classList.toggle("primary",b.dataset.f===ovFilter));
+  const grid=document.getElementById("ovGrid"); grid.innerHTML="";
+  let n=0;
+  MODES.forEach(m=>{
+    const qs=questionsFor(m);
+    qs.forEach((q,i)=>{
+      n++; const ok=checked[m][i]&&isCorrect(m,i); const bad=checked[m][i]&&!isCorrect(m,i); const none=!checked[m][i];
+      if(ovFilter!=="all"){ if(ovFilter==="ok"&&!ok) return; if(ovFilter==="bad"&&!bad) return; if(ovFilter==="none"&&!none) return; }
+      const el=document.createElement("div"); el.className="ovItem"+(ok?" ok":bad?" bad":" none");
+      el.innerHTML=`<div class="ovNum">${n}</div><div>${m} #${i+1}</div><div style="color:var(--mut);font-size:.72rem">${ok?'correct':bad?'wrong':'unanswered'}</div>`;
+      el.onclick=()=>{ mode=m; idx[m]=i; document.getElementById("overview").classList.remove("open"); switchMode(m); };
+      grid.appendChild(el);
+    });
+  });
+  if(!grid.children.length) grid.innerHTML="<p style='color:var(--mut)'>No items in this filter.</p>";
+}
+
+function resetAll(){ sel={drag:{},single:{},multi:{},tf:{}}; checked={drag:{},single:{},multi:{},tf:{}}; render(); }
+function reshuffleAll(){
+  resetAll();
+  // reassign arrays (they were const-declared with let-like reassignment via window)
+  // Note: arrays are declared with const above; to reshuffle we mutate in place.
+  const nd=shuffleArray(_origDrag), ns=shuffleArray(_origSingle).map(shuffleOptions), nm=shuffleArray(_origMulti).map(shuffleOptions), nt=shuffleArray(_origTF);
+  dragQuestions.length=0; dragQuestions.push(...nd);
+  singleQuestions.length=0; singleQuestions.push(...ns);
+  multiQuestions.length=0; multiQuestions.push(...nm);
+  trueFalseQuestions.length=0; trueFalseQuestions.push(...nt);
+  idx={drag:0,single:0,multi:0,tf:0};
+  switchMode(mode);
+}
+
+document.addEventListener("keydown",e=>{
+  if(e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA") return;
+  if(e.key==="ArrowRight") nextQ();
+  else if(e.key==="ArrowLeft") prevQ();
+});
+
+(function init(){
+  document.getElementById("hdrTitle").textContent=TITLE;
+  // hide drag tab if no drag questions (Detail card mode)
+  if(!dragQuestions.length){ document.querySelector('.tab[data-mode="drag"]').style.display="none"; if(mode==="drag") mode="single"; }
+  load(); switchMode(mode);
+})();
+</script>
+</body>
+</html>
