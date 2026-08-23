@@ -17,11 +17,11 @@
     .rt{font-size:22px;font-weight:700;fill:#FFFFFF}
     .rt2{font-size:14px;fill:#CBD5E1}
   </style>
-  <text x="56" y="48" class="t">根 → 主干 → 四根分支 → 树叶</text>
+  <text x="56" y="48" class="t">树根 → 主干 → 分支 → 树叶</text>
   <text x="56" y="74" class="st">每层回答一个问题。红字是「不是什么」。树叶只实现所属分支，不另开主干。</text>
 
   <rect x="460" y="100" width="400" height="96" rx="14" fill="#1E293B"/>
-  <text x="660" y="138" class="rt" text-anchor="middle">根 · session log</text>
+  <text x="660" y="138" class="rt" text-anchor="middle">树根 · session log</text>
   <text x="660" y="164" class="rt2" text-anchor="middle">是：goal/change 即真相</text>
   <text x="660" y="184" font-size="13" fill="#FECACA" text-anchor="middle">不是：另存表 / 内存 steering</text>
 

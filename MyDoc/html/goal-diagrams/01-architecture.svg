@@ -47,7 +47,7 @@
   <text x="816" y="423" class="chip" fill="#15803D" text-anchor="middle">append goal/change</text>
 
   <rect x="250" y="458" width="900" height="96" rx="14" fill="#ECFDF5" stroke="#16A34A" stroke-width="2.5"/>
-  <text x="700" y="498" class="bt" fill="#166534" text-anchor="middle">根 · Session log（唯一持久真相）</text>
+  <text x="700" y="498" class="bt" fill="#166534" text-anchor="middle">树根 · Session log（唯一持久真相）</text>
   <text x="700" y="528" class="bs" text-anchor="middle">当前状态由 fold 推出，不另存表</text>
 
   <path d="M250 506 H70 V320 H248" fill="none" stroke="#4F46E5" stroke-width="3" marker-end="url(#mIndigo)"/>

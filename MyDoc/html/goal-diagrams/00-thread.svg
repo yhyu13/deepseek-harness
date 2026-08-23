@@ -29,7 +29,7 @@
   <line x1="660" y1="346" x2="660" y2="388" stroke="#64748B" stroke-width="2" marker-end="url(#a)"/>
 
   <rect x="80" y="390" width="1160" height="96" rx="14" fill="#ECFDF5" stroke="#16A34A" stroke-width="2"/>
-  <text x="110" y="428" class="h" fill="#166534">根 · 每次变更追加 goal/change，当前态由日志 fold 出来</text>
+  <text x="110" y="428" class="h" fill="#166534">树根 · 每次变更追加 goal/change，当前态由日志 fold 出来</text>
   <text x="110" y="460" class="no">不是另存一张表；不是只活在内存、重启即丢的 steering</text>
 
   <line x1="660" y1="486" x2="660" y2="528" stroke="#64748B" stroke-width="2" marker-end="url(#a)"/>

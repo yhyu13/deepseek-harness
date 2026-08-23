@@ -8,7 +8,7 @@
     .p{font-size:15px;fill:#334155}
   </style>
   <text x="56" y="48" class="t">收获：能搬走的是这七句，不是文件名</text>
-  <text x="56" y="74" class="st">树叶会改名。根和主干如果对了，换一套实现还是同一棵树。</text>
+  <text x="56" y="74" class="st">树叶会改名。树根和主干如果对了，换一套实现还是同一棵树。</text>
 
   <rect x="56" y="100" width="590" height="88" rx="12" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
   <text x="80" y="136" class="n">1. 别把目标焊进主循环</text>
@@ -35,7 +35,7 @@
   <text x="698" y="380" class="p">一行表或一串事件，二选一；产品契约可以相近</text>
 
   <rect x="56" y="424" width="1208" height="88" rx="12" fill="#1E293B"/>
-  <text x="80" y="460" font-size="18" font-weight="700" fill="#FFFFFF">7. 根和主干错了，叶子再漂亮也会在同一处裂开</text>
+  <text x="80" y="460" font-size="18" font-weight="700" fill="#FFFFFF">7. 树根和主干错了，叶子再漂亮也会在同一处裂开</text>
   <text x="80" y="488" font-size="15" fill="#CBD5E1">改 loop、把 armed 写进日志、用提示词当权限 —— 恢复、fork、子代理、空闲续跑会一起爆</text>
 
   <rect x="56" y="540" width="1208" height="190" rx="14" fill="#FFFBEB" stroke="#D97706" stroke-width="2"/>
