@@ -1,70 +1,72 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1320" height="820" viewBox="0 0 1320 820">
+<svg xmlns="http://www.w3.org/2000/svg" width="1320" height="860" viewBox="0 0 1320 860">
   <defs>
     <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#64748B"/></marker>
   </defs>
-  <rect width="1320" height="820" fill="#F8FAFC"/>
+  <rect width="1320" height="860" fill="#F8FAFC"/>
   <style>
     text{font-family:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif}
-    .t{font-size:28px;font-weight:700;fill:#0F172A}
+    .t{font-size:26px;font-weight:700;fill:#0F172A}
     .st{font-size:16px;fill:#64748B}
     .h{font-size:20px;font-weight:700}
     .ch{font-size:16px;font-weight:700}
     .rl{font-size:15px;fill:#334155}
     .ed{font-size:13px;fill:#64748B}
     .or{font-size:18px;font-weight:700;fill:#64748B}
+    .no{font-size:15px;fill:#9F1239}
   </style>
-  <text x="60" y="50" class="t">两个正交维度：phase（持久）正交于 activation（进程本地）</text>
-  <text x="60" y="74" class="st">phase 写进日志、可回放；activation 只在当前进程内，永不落盘</text>
+  <text x="56" y="48" class="t">切开：phase 持久，activation 永不落盘</text>
+  <text x="56" y="74" class="st">是：进展可回放。不是：把「能否自动续跑」写进日志。</text>
 
-  <rect x="60" y="110" width="560" height="560" rx="16" fill="#F0FDF4" stroke="#16A34A" stroke-width="2"/>
-  <text x="90" y="150" class="h" fill="#166534">phase · 持久（写进 session log）</text>
+  <rect x="56" y="106" width="560" height="580" rx="16" fill="#F0FDF4" stroke="#16A34A" stroke-width="2"/>
+  <text x="86" y="146" class="h" fill="#166534">phase · 是什么（写进 session log）</text>
 
-  <rect x="240" y="190" width="200" height="60" rx="10" fill="#16A34A"/>
-  <text x="340" y="226" class="ch" fill="#FFFFFF" text-anchor="middle">active</text>
+  <rect x="236" y="186" width="200" height="60" rx="10" fill="#16A34A"/>
+  <text x="336" y="222" class="ch" fill="#FFFFFF" text-anchor="middle">active</text>
 
-  <rect x="130" y="340" width="200" height="60" rx="10" fill="#D97706"/>
-  <text x="230" y="376" class="ch" fill="#FFFFFF" text-anchor="middle">paused</text>
+  <rect x="126" y="336" width="200" height="60" rx="10" fill="#D97706"/>
+  <text x="226" y="372" class="ch" fill="#FFFFFF" text-anchor="middle">paused</text>
 
-  <rect x="350" y="340" width="200" height="60" rx="10" fill="#DC2626"/>
-  <text x="450" y="376" class="ch" fill="#FFFFFF" text-anchor="middle">blocked</text>
+  <rect x="346" y="336" width="200" height="60" rx="10" fill="#DC2626"/>
+  <text x="446" y="372" class="ch" fill="#FFFFFF" text-anchor="middle">blocked</text>
 
-  <rect x="240" y="510" width="200" height="60" rx="10" fill="#2563EB"/>
-  <text x="340" y="546" class="ch" fill="#FFFFFF" text-anchor="middle">complete</text>
+  <rect x="236" y="506" width="200" height="60" rx="10" fill="#2563EB"/>
+  <text x="336" y="542" class="ch" fill="#FFFFFF" text-anchor="middle">complete</text>
 
-  <line x1="300" y1="250" x2="250" y2="338" stroke="#64748B" stroke-width="2" marker-start="url(#a)" marker-end="url(#a)"/>
-  <text x="186" y="280" class="ed">pause / resume</text>
-  <line x1="380" y1="250" x2="430" y2="338" stroke="#64748B" stroke-width="2" marker-start="url(#a)" marker-end="url(#a)"/>
-  <text x="426" y="280" class="ed">block / resume</text>
-  <line x1="340" y1="250" x2="340" y2="508" stroke="#2563EB" stroke-width="2" marker-end="url(#a)"/>
-  <text x="292" y="460" class="ed" fill="#1D4ED8">complete</text>
-  <line x1="230" y1="400" x2="290" y2="510" stroke="#2563EB" stroke-width="2" marker-end="url(#a)"/>
-  <text x="140" y="480" class="ed" fill="#1D4ED8">complete</text>
-  <line x1="450" y1="400" x2="390" y2="510" stroke="#2563EB" stroke-width="2" marker-end="url(#a)"/>
-  <text x="470" y="480" class="ed" fill="#1D4ED8">complete</text>
-  <text x="90" y="630" class="ed">block 只从 active 进入；active / paused / blocked 均可 complete</text>
+  <line x1="296" y1="246" x2="246" y2="334" stroke="#64748B" stroke-width="2" marker-start="url(#a)" marker-end="url(#a)"/>
+  <text x="176" y="276" class="ed">pause / resume</text>
+  <line x1="376" y1="246" x2="426" y2="334" stroke="#64748B" stroke-width="2" marker-start="url(#a)" marker-end="url(#a)"/>
+  <text x="422" y="276" class="ed">block / resume</text>
+  <line x1="336" y1="246" x2="336" y2="504" stroke="#2563EB" stroke-width="2" marker-end="url(#a)"/>
+  <text x="288" y="456" class="ed" fill="#1D4ED8">complete</text>
+  <line x1="226" y1="396" x2="286" y2="506" stroke="#2563EB" stroke-width="2" marker-end="url(#a)"/>
+  <text x="136" y="476" class="ed" fill="#1D4ED8">complete</text>
+  <line x1="446" y1="396" x2="386" y2="506" stroke="#2563EB" stroke-width="2" marker-end="url(#a)"/>
+  <text x="466" y="476" class="ed" fill="#1D4ED8">complete</text>
+  <text x="86" y="640" class="ed">block 只从 active 进入；active / paused / blocked 均可 complete</text>
+  <text x="86" y="662" class="no">不是：armed 写在 phase 里</text>
 
-  <text x="660" y="400" class="or" text-anchor="middle">正交于</text>
+  <text x="656" y="396" class="or" text-anchor="middle">正交于</text>
 
-  <rect x="700" y="110" width="560" height="560" rx="16" fill="#FFFBEB" stroke="#D97706" stroke-width="2"/>
-  <text x="730" y="150" class="h" fill="#92400E">activation · 进程本地（永不落盘）</text>
+  <rect x="704" y="106" width="560" height="580" rx="16" fill="#FFFBEB" stroke="#D97706" stroke-width="2"/>
+  <text x="734" y="146" class="h" fill="#92400E">activation · 是什么（永不落盘）</text>
 
-  <rect x="790" y="185" width="220" height="60" rx="10" fill="#16A34A"/>
-  <text x="900" y="221" class="ch" fill="#FFFFFF" text-anchor="middle">armed</text>
-  <rect x="790" y="285" width="220" height="60" rx="10" fill="#94A3B8"/>
-  <text x="900" y="321" class="ch" fill="#FFFFFF" text-anchor="middle">disarmed</text>
-  <line x1="900" y1="245" x2="900" y2="283" stroke="#64748B" stroke-width="2" marker-start="url(#a)" marker-end="url(#a)"/>
+  <rect x="794" y="186" width="220" height="60" rx="10" fill="#16A34A"/>
+  <text x="904" y="222" class="ch" fill="#FFFFFF" text-anchor="middle">armed</text>
+  <rect x="794" y="286" width="220" height="60" rx="10" fill="#94A3B8"/>
+  <text x="904" y="322" class="ch" fill="#FFFFFF" text-anchor="middle">disarmed</text>
+  <line x1="904" y1="246" x2="904" y2="284" stroke="#64748B" stroke-width="2" marker-start="url(#a)" marker-end="url(#a)"/>
 
-  <text x="730" y="400" class="rl">create / resume → armed</text>
-  <text x="730" y="430" class="rl">pause / complete / block / clear → disarmed</text>
-  <text x="730" y="460" class="rl">edit → 保持原样</text>
+  <text x="734" y="400" class="rl">create / resume → armed</text>
+  <text x="734" y="430" class="rl">pause / complete / block / clear → disarmed</text>
+  <text x="734" y="460" class="rl">edit → 保持原样</text>
 
-  <line x1="730" y1="500" x2="1230" y2="500" stroke="#F59E0B" stroke-width="1"/>
-  <text x="730" y="535" class="rl" font-weight="700" fill="#92400E">关键规则</text>
-  <text x="730" y="565" class="rl">session-start / 恢复 / fork → 强制 disarm</text>
-  <text x="730" y="595" class="rl">恢复后必须由人 resume，才会重新 armed</text>
-  <text x="730" y="625" class="rl">执行授权绝不随状态一起回放</text>
+  <line x1="734" y1="500" x2="1234" y2="500" stroke="#F59E0B" stroke-width="1"/>
+  <text x="734" y="536" class="rl" font-weight="700" fill="#92400E">不是什么</text>
+  <text x="734" y="566" class="no">不是随 goal/change 回放</text>
+  <text x="734" y="596" class="no">不是恢复 / fork 后自动续跑</text>
+  <text x="734" y="626" class="rl">session-start 强制 disarm；要人再 resume</text>
 
-  <rect x="60" y="700" width="1200" height="80" rx="12" fill="#FEF2F2" stroke="#DC2626" stroke-width="1.5"/>
-  <text x="660" y="734" font-size="18" font-weight="700" fill="#B91C1C" text-anchor="middle">恢复或 fork 的会话：phase 仍可以是 active，但 activation = disarmed</text>
-  <text x="660" y="760" font-size="15" fill="#7F1D1D" text-anchor="middle">不会自动继续执行；必须等人明确 resume</text>
+  <rect x="56" y="712" width="1208" height="108" rx="12" fill="#FEF2F2" stroke="#DC2626" stroke-width="1.5"/>
+  <text x="660" y="756" font-size="18" font-weight="700" fill="#B91C1C" text-anchor="middle">合法组合：phase = active，activation = disarmed</text>
+  <text x="660" y="788" font-size="15" fill="#7F1D1D" text-anchor="middle">状态可以回放；执行授权必须重授</text>
 </svg>

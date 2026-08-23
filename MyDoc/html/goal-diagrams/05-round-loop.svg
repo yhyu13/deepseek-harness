@@ -1,20 +1,21 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1320" height="880" viewBox="0 0 1320 880">
+<svg xmlns="http://www.w3.org/2000/svg" width="1320" height="900" viewBox="0 0 1320 900">
   <defs>
     <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#64748B"/></marker>
   </defs>
-  <rect width="1320" height="880" fill="#F8FAFC"/>
+  <rect width="1320" height="900" fill="#F8FAFC"/>
   <style>
     text{font-family:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif}
-    .t{font-size:30px;font-weight:700;fill:#0F172A}
+    .t{font-size:26px;font-weight:700;fill:#0F172A}
     .st{font-size:16px;fill:#64748B}
     .nn{font-size:18px;font-weight:700}
     .ns{font-size:13.5px;fill:#475569}
     .el{font-size:14px;fill:#64748B}
     .ch{font-size:17px;font-weight:700}
     .cd{font-size:14px;fill:#334155}
+    .no{font-size:14px;fill:#9F1239}
   </style>
-  <text x="60" y="50" class="t">续跑循环：一次一续 + 反漂移重注入</text>
-  <text x="60" y="74" class="st">每次空闲最多续跑一次（不 busy-loop）；每轮重新注入完整目标（防漂移）</text>
+  <text x="56" y="48" class="t">round 分支：一次一续 + 反漂移重注入</text>
+  <text x="56" y="74" class="st">是：空闲才续、每轮注入完整目标。不是：重试队列、定时轮询、循环计数。</text>
 
   <rect x="555" y="110" width="210" height="88" rx="12" fill="#FEF3C7" stroke="#D97706" stroke-width="2.5"/>
   <text x="660" y="148" class="nn" fill="#92400E" text-anchor="middle">① 空闲检查</text>
@@ -22,15 +23,15 @@
 
   <rect x="895" y="280" width="210" height="88" rx="12" fill="#ECFDF5" stroke="#16A34A" stroke-width="2.5"/>
   <text x="1000" y="318" class="nn" fill="#166534" text-anchor="middle">② 落盘检查点</text>
-  <text x="1000" y="346" class="ns" text-anchor="middle">sessions.flush() 后再复核</text>
+  <text x="1000" y="346" class="ns" text-anchor="middle">flush 后再复核</text>
 
   <rect x="795" y="620" width="230" height="88" rx="12" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2.5"/>
   <text x="910" y="658" class="nn" fill="#3730A3" text-anchor="middle">③ 预留下一轮</text>
-  <text x="910" y="686" class="ns" text-anchor="middle">roundsStarted+1 · CAS id/revision</text>
+  <text x="910" y="686" class="ns" text-anchor="middle">roundsStarted+1 · CAS</text>
 
   <rect x="295" y="620" width="230" height="88" rx="12" fill="#EFF6FF" stroke="#2563EB" stroke-width="2.5"/>
-  <text x="410" y="658" class="nn" fill="#1D4ED8" text-anchor="middle">④ 注入 &lt;goal_round&gt;</text>
-  <text x="410" y="686" class="ns" text-anchor="middle">完整目标 + 证据先行指令</text>
+  <text x="410" y="658" class="nn" fill="#1D4ED8" text-anchor="middle">④ 注入完整目标</text>
+  <text x="410" y="686" class="ns" text-anchor="middle">&lt;goal_round&gt; + 证据先行</text>
 
   <rect x="215" y="280" width="210" height="88" rx="12" fill="#EFF6FF" stroke="#2563EB" stroke-width="2.5"/>
   <text x="320" y="318" class="nn" fill="#1D4ED8" text-anchor="middle">⑤ 模型执行</text>
@@ -41,20 +42,22 @@
   <line x1="1050" y1="368" x2="960" y2="620" stroke="#64748B" stroke-width="2" marker-end="url(#a)"/>
   <text x="1070" y="500" class="el">预留轮次</text>
   <line x1="795" y1="664" x2="525" y2="664" stroke="#64748B" stroke-width="2" marker-end="url(#a)"/>
-  <text x="620" y="656" class="el">注入提示</text>
+  <text x="620" y="652" class="el">注入提示</text>
   <line x1="320" y1="620" x2="290" y2="368" stroke="#64748B" stroke-width="2" marker-end="url(#a)"/>
   <text x="208" y="500" class="el">执行</text>
   <line x1="270" y1="280" x2="620" y2="198" stroke="#64748B" stroke-width="2" marker-end="url(#a)"/>
   <text x="400" y="228" class="el">回到空闲</text>
 
-  <rect x="480" y="400" width="360" height="150" rx="14" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2.5"/>
-  <text x="660" y="434" class="ch" fill="#5B21B6" text-anchor="middle">反漂移在 ④ 落实</text>
-  <text x="660" y="466" class="cd" text-anchor="middle">每轮重新注入完整 objective</text>
-  <text x="660" y="492" class="cd" text-anchor="middle">完成需证据 · 受阻需连续 N 轮</text>
-  <text x="660" y="518" class="cd" text-anchor="middle">有人类消息时让路</text>
+  <rect x="470" y="390" width="380" height="168" rx="14" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2.5"/>
+  <text x="660" y="426" class="ch" fill="#5B21B6" text-anchor="middle">是什么在 ④ 落实</text>
+  <text x="660" y="458" class="cd" text-anchor="middle">每轮重新注入完整 objective</text>
+  <text x="660" y="484" class="cd" text-anchor="middle">complete 要证据 · blocked 要连续 N 轮</text>
+  <text x="660" y="510" class="cd" text-anchor="middle">失败即 disarm，不乐观重试</text>
+  <text x="660" y="536" class="no" text-anchor="middle">不是：模型自己宣布完成</text>
 
-  <line x1="480" y1="490" x2="410" y2="620" stroke="#7C3AED" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#a)"/>
+  <line x1="470" y1="490" x2="410" y2="620" stroke="#7C3AED" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#a)"/>
 
-  <rect x="160" y="770" width="1000" height="56" rx="12" fill="#F1F5F9" stroke="#CBD5E1" stroke-width="1.5"/>
-  <text x="660" y="805" font-size="17" font-weight="700" fill="#334155" text-anchor="middle">约束：agent/pre-step 双校验 · 每次空闲最多一续 · 有人类消息时让路 · 轮次用尽即 block</text>
+  <rect x="140" y="770" width="1040" height="88" rx="12" fill="#F1F5F9" stroke="#CBD5E1" stroke-width="1.5"/>
+  <text x="660" y="806" font-size="16" font-weight="700" fill="#334155" text-anchor="middle">每次空闲最多一续 · 有人类消息时让路 · 轮次用尽即 block</text>
+  <text x="660" y="834" class="no" text-anchor="middle">不是 busy-loop，不是定时器，不是循环计数器</text>
 </svg>

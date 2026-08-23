@@ -1,90 +1,103 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1320" height="880" viewBox="0 0 1320 880">
+<svg xmlns="http://www.w3.org/2000/svg" width="1320" height="980" viewBox="0 0 1320 980">
   <defs>
     <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#64748B"/></marker>
   </defs>
-  <rect width="1320" height="880" fill="#F8FAFC"/>
+  <rect width="1320" height="980" fill="#F8FAFC"/>
   <style>
     text{font-family:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif}
-    .t{font-size:30px;font-weight:700;fill:#0F172A}
+    .t{font-size:28px;font-weight:700;fill:#0F172A}
     .st{font-size:16px;fill:#64748B}
     .bn{font-size:18px;font-weight:700}
-    .bq{font-size:14px;fill:#475569}
+    .bq{font-size:14px;fill:#334155}
+    .no{font-size:13px;fill:#9F1239}
     .lh{font-size:13px;fill:#64748B;font-weight:700}
     .li{font-size:13px;fill:#334155}
     .tk{font-size:22px;font-weight:700}
-    .tk2{font-size:15px;fill:#475569}
+    .tk2{font-size:14px;fill:#475569}
     .rt{font-size:22px;font-weight:700;fill:#FFFFFF}
     .rt2{font-size:14px;fill:#CBD5E1}
   </style>
-  <text x="60" y="50" class="t">目标功能的逻辑层次：根 → 主干 → 分支 → 树叶</text>
-  <text x="60" y="74" class="st">根 = session log；主干 = 可回放生命周期；分支 = 四条正交约束；树叶 = 末端实现</text>
+  <text x="56" y="48" class="t">根 → 主干 → 四根分支 → 树叶</text>
+  <text x="56" y="74" class="st">每层回答一个问题。红字是「不是什么」。树叶只实现所属分支，不另开主干。</text>
 
-  <rect x="480" y="110" width="360" height="90" rx="14" fill="#1E293B" stroke="#0F172A" stroke-width="2"/>
-  <text x="660" y="148" class="rt" text-anchor="middle">根 · session log</text>
-  <text x="660" y="174" class="rt2" text-anchor="middle">goal/change 事件 —— 唯一真相</text>
+  <rect x="460" y="100" width="400" height="96" rx="14" fill="#1E293B"/>
+  <text x="660" y="138" class="rt" text-anchor="middle">根 · session log</text>
+  <text x="660" y="164" class="rt2" text-anchor="middle">是：goal/change 即真相</text>
+  <text x="660" y="184" font-size="13" fill="#FECACA" text-anchor="middle">不是：另存表 / 内存 steering</text>
 
-  <line x1="660" y1="200" x2="660" y2="248" stroke="#64748B" stroke-width="2" marker-end="url(#a)"/>
+  <line x1="660" y1="196" x2="660" y2="236" stroke="#64748B" stroke-width="2" marker-end="url(#a)"/>
 
-  <rect x="480" y="250" width="360" height="120" rx="14" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2.5"/>
-  <text x="660" y="300" class="tk" fill="#3730A3" text-anchor="middle">主干 · 可回放生命周期</text>
-  <text x="660" y="332" class="tk2" text-anchor="middle">严格 fold + CAS revision</text>
-  <text x="660" y="354" class="tk2" text-anchor="middle">回答：什么版本、什么 phase</text>
+  <rect x="430" y="238" width="460" height="110" rx="14" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2.5"/>
+  <text x="660" y="278" class="tk" fill="#3730A3" text-anchor="middle">主干 · 可回放生命周期</text>
+  <text x="660" y="306" class="tk2" text-anchor="middle">是：严格 fold + CAS → 什么版本、什么 phase</text>
+  <text x="660" y="328" class="no" text-anchor="middle">不是：后写覆盖 / 散落布尔标志</text>
 
-  <line x1="660" y1="370" x2="660" y2="418" stroke="#64748B" stroke-width="2" marker-end="url(#a)"/>
-  <line x1="225" y1="418" x2="1095" y2="418" stroke="#64748B" stroke-width="2"/>
-  <line x1="225" y1="418" x2="225" y2="458" stroke="#64748B" stroke-width="2" marker-end="url(#a)"/>
-  <line x1="515" y1="418" x2="515" y2="458" stroke="#64748B" stroke-width="2" marker-end="url(#a)"/>
-  <line x1="805" y1="418" x2="805" y2="458" stroke="#64748B" stroke-width="2" marker-end="url(#a)"/>
-  <line x1="1095" y1="418" x2="1095" y2="458" stroke="#64748B" stroke-width="2" marker-end="url(#a)"/>
+  <line x1="660" y1="348" x2="660" y2="392" stroke="#64748B" stroke-width="2" marker-end="url(#a)"/>
+  <line x1="190" y1="392" x2="1130" y2="392" stroke="#64748B" stroke-width="2"/>
+  <line x1="190" y1="392" x2="190" y2="428" stroke="#64748B" stroke-width="2" marker-end="url(#a)"/>
+  <line x1="500" y1="392" x2="500" y2="428" stroke="#64748B" stroke-width="2" marker-end="url(#a)"/>
+  <line x1="820" y1="392" x2="820" y2="428" stroke="#64748B" stroke-width="2" marker-end="url(#a)"/>
+  <line x1="1130" y1="392" x2="1130" y2="428" stroke="#64748B" stroke-width="2" marker-end="url(#a)"/>
 
-  <rect x="100" y="460" width="250" height="130" rx="12" fill="#ECFDF5" stroke="#16A34A" stroke-width="2"/>
-  <text x="120" y="505" class="bn" fill="#166534">分支 1 · phase</text>
-  <text x="120" y="535" class="bq">持久 · 进展到哪？</text>
-  <text x="120" y="562" class="bq">active / paused / blocked / complete</text>
+  <rect x="60" y="430" width="260" height="150" rx="12" fill="#ECFDF5" stroke="#16A34A" stroke-width="2"/>
+  <text x="80" y="464" class="bn" fill="#166534">分支 · phase</text>
+  <text x="80" y="492" class="bq">是：进展到哪（持久）</text>
+  <text x="80" y="516" class="bq">active / paused</text>
+  <text x="80" y="536" class="bq">blocked / complete</text>
+  <text x="80" y="560" class="no">不是：能否自动续跑</text>
 
-  <rect x="390" y="460" width="250" height="130" rx="12" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/>
-  <text x="410" y="505" class="bn" fill="#92400E">分支 2 · activation</text>
-  <text x="410" y="535" class="bq">进程本地 · 能否自动续？</text>
-  <text x="410" y="562" class="bq">armed / disarmed（永不落盘）</text>
+  <rect x="370" y="430" width="260" height="150" rx="12" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/>
+  <text x="390" y="464" class="bn" fill="#92400E">分支 · activation</text>
+  <text x="390" y="492" class="bq">是：这一进程能否自动续</text>
+  <text x="390" y="516" class="bq">armed / disarmed（永不落盘）</text>
+  <text x="390" y="548" class="no">不是：写进日志随状态回放</text>
 
-  <rect x="680" y="460" width="250" height="130" rx="12" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
-  <text x="700" y="505" class="bn" fill="#5B21B6">分支 3 · authority</text>
-  <text x="700" y="535" class="bq">运行时 · 谁有资格改 / 停？</text>
-  <text x="700" y="562" class="bq">执行期校验，不靠提示词</text>
+  <rect x="690" y="430" width="260" height="150" rx="12" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+  <text x="710" y="464" class="bn" fill="#5B21B6">分支 · authority</text>
+  <text x="710" y="492" class="bq">是：谁有资格改 / 停</text>
+  <text x="710" y="516" class="bq">执行期校验，宿主签发</text>
+  <text x="710" y="548" class="no">不是：提示词 / 血缘授权</text>
 
-  <rect x="970" y="460" width="250" height="130" rx="12" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
-  <text x="990" y="505" class="bn" fill="#1D4ED8">分支 4 · round</text>
-  <text x="990" y="535" class="bq">运行时 · 何时开下一轮、怎么防漂？</text>
-  <text x="990" y="562" class="bq">空闲自启动，一次一续</text>
+  <rect x="1000" y="430" width="260" height="150" rx="12" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+  <text x="1020" y="464" class="bn" fill="#1D4ED8">分支 · round</text>
+  <text x="1020" y="492" class="bq">是：何时开下一轮、怎么防漂</text>
+  <text x="1020" y="516" class="bq">空闲一次一续 + 重注入</text>
+  <text x="1020" y="548" class="no">不是：重试队列 / 循环计数</text>
 
-  <line x1="225" y1="590" x2="225" y2="648" stroke="#64748B" stroke-width="2" marker-end="url(#a)"/>
-  <line x1="515" y1="590" x2="515" y2="648" stroke="#64748B" stroke-width="2" marker-end="url(#a)"/>
-  <line x1="805" y1="590" x2="805" y2="648" stroke="#64748B" stroke-width="2" marker-end="url(#a)"/>
-  <line x1="1095" y1="590" x2="1095" y2="648" stroke="#64748B" stroke-width="2" marker-end="url(#a)"/>
+  <line x1="190" y1="580" x2="190" y2="628" stroke="#64748B" stroke-width="2" marker-end="url(#a)"/>
+  <line x1="500" y1="580" x2="500" y2="628" stroke="#64748B" stroke-width="2" marker-end="url(#a)"/>
+  <line x1="820" y1="580" x2="820" y2="628" stroke="#64748B" stroke-width="2" marker-end="url(#a)"/>
+  <line x1="1130" y1="580" x2="1130" y2="628" stroke="#64748B" stroke-width="2" marker-end="url(#a)"/>
 
-  <rect x="100" y="650" width="250" height="150" rx="12" fill="#FFFFFF" stroke="#94A3B8" stroke-width="1.5"/>
-  <text x="120" y="676" class="lh">树叶 · 末端实现</text>
-  <text x="120" y="706" class="li">transition() 允许集合</text>
-  <text x="120" y="732" class="li">validateSnapshotTransition</text>
-  <text x="120" y="758" class="li">resolveBlockReason</text>
+  <rect x="60" y="630" width="260" height="168" rx="12" fill="#FFFFFF" stroke="#94A3B8" stroke-width="1.5"/>
+  <text x="80" y="656" class="lh">树叶</text>
+  <text x="80" y="686" class="li">transition() 允许集合</text>
+  <text x="80" y="710" class="li">validateSnapshotTransition</text>
+  <text x="80" y="734" class="li">decodeSnapshot</text>
+  <text x="80" y="758" class="li">resolveBlockReason</text>
 
-  <rect x="390" y="650" width="250" height="150" rx="12" fill="#FFFFFF" stroke="#94A3B8" stroke-width="1.5"/>
-  <text x="410" y="676" class="lh">树叶 · 末端实现</text>
-  <text x="410" y="706" class="li">session-start 强制 disarm</text>
-  <text x="410" y="732" class="li">disarm() / resume() 余量</text>
-  <text x="410" y="758" class="li">goal/changed → checkpoint</text>
+  <rect x="370" y="630" width="260" height="168" rx="12" fill="#FFFFFF" stroke="#94A3B8" stroke-width="1.5"/>
+  <text x="390" y="656" class="lh">树叶</text>
+  <text x="390" y="686" class="li">session-start 强制 disarm</text>
+  <text x="390" y="710" class="li">disarm() / resume() 余量</text>
+  <text x="390" y="734" class="li">goal/changed → checkpoint</text>
+  <text x="390" y="758" class="li">永不写入 goal/change</text>
 
-  <rect x="680" y="650" width="250" height="150" rx="12" fill="#FFFFFF" stroke="#94A3B8" stroke-width="1.5"/>
-  <text x="700" y="676" class="lh">树叶 · 末端实现</text>
-  <text x="700" y="706" class="li">goalToolExecution</text>
-  <text x="700" y="732" class="li">requireDirectHuman</text>
-  <text x="700" y="758" class="li">completionAuthority</text>
+  <rect x="690" y="630" width="260" height="168" rx="12" fill="#FFFFFF" stroke="#94A3B8" stroke-width="1.5"/>
+  <text x="710" y="656" class="lh">树叶</text>
+  <text x="710" y="686" class="li">goalToolExecution</text>
+  <text x="710" y="710" class="li">requireDirectHuman</text>
+  <text x="710" y="734" class="li">completionAuthority</text>
+  <text x="710" y="758" class="li">blocked 连续 N 轮门槛</text>
 
-  <rect x="970" y="650" width="250" height="150" rx="12" fill="#FFFFFF" stroke="#94A3B8" stroke-width="1.5"/>
-  <text x="990" y="676" class="lh">树叶 · 末端实现</text>
-  <text x="990" y="706" class="li">drive() 预留轮次</text>
-  <text x="990" y="732" class="li">pre-step 双校验</text>
-  <text x="990" y="758" class="li">renderGoalRoundPrompt</text>
+  <rect x="1000" y="630" width="260" height="168" rx="12" fill="#FFFFFF" stroke="#94A3B8" stroke-width="1.5"/>
+  <text x="1020" y="656" class="lh">树叶</text>
+  <text x="1020" y="686" class="li">drive() 预留轮次</text>
+  <text x="1020" y="710" class="li">pre-step 双校验</text>
+  <text x="1020" y="734" class="li">renderGoalRoundPrompt</text>
+  <text x="1020" y="758" class="li">失败即 disarm / block</text>
 
-  <text x="660" y="850" class="st" text-anchor="middle">贯穿主线：持久化状态 与 执行权限 分离 —— 状态可回放，权限必须重授</text>
+  <rect x="60" y="830" width="1200" height="96" rx="12" fill="#1E293B"/>
+  <text x="660" y="870" font-size="20" font-weight="700" fill="#FFFFFF" text-anchor="middle">横切纪律（不是第五根分支）：插件接缝 · branded id · 非法配置加载即抛</text>
+  <text x="660" y="900" font-size="15" fill="#CBD5E1" text-anchor="middle">主线：状态可回放，权限必须重授</text>
 </svg>
