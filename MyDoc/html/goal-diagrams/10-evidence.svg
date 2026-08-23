@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1320" height="600" viewBox="0 0 1320 600">
+  <rect width="1320" height="600" fill="#F8FAFC"/>
+  <style>
+    text{font-family:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif}
+    .t{font-size:26px;font-weight:700;fill:#0F172A}
+    .st{font-size:16px;fill:#64748B}
+    .h{font-size:20px;font-weight:700}
+    .p{font-size:16px;fill:#334155}
+    .no{font-size:15px;fill:#9F1239}
+    .ok{font-size:15px;fill:#166534}
+  </style>
+  <text x="56" y="48" class="t">「我做完了」不算完。工作区说了才算。</text>
+  <text x="56" y="74" class="st">是：拿磁盘上的真实状态当权威。不是：模型自己宣布完成或卡住。</text>
+
+  <rect x="56" y="110" width="580" height="260" rx="14" fill="#FEF2F2" stroke="#DC2626" stroke-width="2"/>
+  <text x="86" y="154" class="h" fill="#B91C1C">不算</text>
+  <text x="86" y="200" class="no">「我认为目标已经完成」</text>
+  <text x="86" y="236" class="no">「我被挡住了，请标记 blocked」</text>
+  <text x="86" y="272" class="no">只说了一轮的借口</text>
+  <text x="86" y="320" class="p">模型会把目标缩小，好早点收工。</text>
+
+  <rect x="684" y="110" width="580" height="260" rx="14" fill="#ECFDF5" stroke="#16A34A" stroke-width="2"/>
+  <text x="714" y="154" class="h" fill="#166534">才算</text>
+  <text x="714" y="200" class="ok">打开工作区 / 持久态，指出证据</text>
+  <text x="714" y="236" class="ok">complete：证据对得上完整目标</text>
+  <text x="714" y="272" class="ok">blocked：同一条件连续出现 N 轮</text>
+  <text x="714" y="308" class="ok">并且讲得出具体卡在哪</text>
+  <text x="714" y="344" class="p">目标原文每一轮都重新念一遍，防缩小。</text>
+
+  <rect x="56" y="400" width="1208" height="150" rx="14" fill="#F1F5F9" stroke="#CBD5E1" stroke-width="1.5"/>
+  <text x="86" y="448" class="p">人话：长期目标最常见的死法，不是跑不动，是模型偷偷改题。</text>
+  <text x="86" y="484" class="p">所以每一轮把完整目标再注入一次；收工不听口头，听工作区。</text>
+  <text x="86" y="520" class="p">卡住也要重复出现，才允许认输——避免一轮运气不好就放弃。</text>
+</svg>

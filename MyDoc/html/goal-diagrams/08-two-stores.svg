@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1320" height="680" viewBox="0 0 1320 680">
+  <rect width="1320" height="680" fill="#F8FAFC"/>
+  <style>
+    text{font-family:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif}
+    .t{font-size:26px;font-weight:700;fill:#0F172A}
+    .st{font-size:16px;fill:#64748B}
+    .h{font-size:20px;font-weight:700}
+    .p{font-size:16px;fill:#334155}
+    .no{font-size:15px;fill:#9F1239}
+    .ok{font-size:15px;fill:#166534}
+  </style>
+  <text x="56" y="48" class="t">两种记账法，选一种当真相</text>
+  <text x="56" y="74" class="st">是：要么一行当前态，要么一串变更事件。不是：两套都写，对不上再猜。</text>
+
+  <rect x="56" y="110" width="580" height="340" rx="14" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
+  <text x="86" y="154" class="h" fill="#3730A3">Codex 那条路</text>
+  <text x="86" y="200" class="p">每个线程一行 SQLite</text>
+  <text x="86" y="236" class="p">读这一行，就知道现在的目标</text>
+  <text x="86" y="272" class="p">重启后：行还在 active，就重新 armed</text>
+  <text x="86" y="320" class="ok">适合：已经有独立状态库，</text>
+  <text x="86" y="352" class="ok">会话日志不是产品日志</text>
+  <text x="86" y="396" class="p">人话：抽屉里放一张卡片，卡片上写着现在的答案。</text>
+
+  <rect x="684" y="110" width="580" height="340" rx="14" fill="#ECFDF5" stroke="#16A34A" stroke-width="2"/>
+  <text x="714" y="154" class="h" fill="#166534">DeepSeek Harness 这条路</text>
+  <text x="714" y="200" class="p">不另开抽屉</text>
+  <text x="714" y="236" class="p">每次变更往会话日志追加一条</text>
+  <text x="714" y="272" class="p">把流水账折一遍（fold），得到现在</text>
+  <text x="714" y="320" class="ok">适合：会话日志已经是唯一真相，</text>
+  <text x="714" y="352" class="ok">模型看见的必须能回放</text>
+  <text x="714" y="396" class="p">人话：不另建档案柜，翻聊天记录就能还原。</text>
+
+  <rect x="56" y="480" width="1208" height="150" rx="14" fill="#FEF2F2" stroke="#DC2626" stroke-width="1.5"/>
+  <text x="86" y="528" class="no">两边都做，就是两套真相。</text>
+  <text x="86" y="564" class="p">产品契约可以相近（空闲续跑、防漂移、拿证据再完成）。</text>
+  <text x="86" y="600" class="p">记账法和「重启后能不能自己跑起来」，可以完全不同。选你的 harness 已经认哪本账。</text>
+</svg>

@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1320" height="620" viewBox="0 0 1320 620">
+  <rect width="1320" height="620" fill="#F8FAFC"/>
+  <style>
+    text{font-family:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif}
+    .t{font-size:26px;font-weight:700;fill:#0F172A}
+    .st{font-size:16px;fill:#64748B}
+    .h{font-size:20px;font-weight:700}
+    .p{font-size:16px;fill:#334155}
+    .no{font-size:15px;fill:#9F1239}
+    .ok{font-size:15px;fill:#166534}
+  </style>
+  <text x="56" y="48" class="t">模型看见的，必须能从日志里再翻出来</text>
+  <text x="56" y="74" class="st">是：目标状态、续跑时念的那段话，都先落账。不是：只活在内存里、重启就忘的叮嘱。</text>
+
+  <rect x="56" y="110" width="580" height="280" rx="14" fill="#ECFDF5" stroke="#16A34A" stroke-width="2"/>
+  <text x="86" y="154" class="h" fill="#166534">会进模型请求的</text>
+  <text x="86" y="200" class="p">1. 当前目标是什么、走到哪</text>
+  <text x="86" y="236" class="p">2. 续跑时重新念的那段完整目标</text>
+  <text x="86" y="272" class="p">3. 人刚改过目标之后的新版本</text>
+  <text x="86" y="320" class="ok">都必须能在 session 日志里找到对应事件</text>
+  <text x="86" y="352" class="ok">重启、回放、换一台机器，还能还原当时模型看到的世界</text>
+
+  <rect x="684" y="110" width="580" height="280" rx="14" fill="#FEF2F2" stroke="#DC2626" stroke-width="2"/>
+  <text x="714" y="154" class="h" fill="#B91C1C">不算目标功能</text>
+  <text x="714" y="200" class="no">系统提示词里随口加一句「请继续」</text>
+  <text x="714" y="236" class="no">内存里一份 steering，进程一死就没了</text>
+  <text x="714" y="272" class="no">日志对不上、回放对不齐的「口头叮嘱」</text>
+  <text x="714" y="320" class="p">这些东西模型当时也许看见了，</text>
+  <text x="714" y="352" class="p">事后却无法证明它看见过。</text>
+
+  <rect x="56" y="420" width="1208" height="150" rx="14" fill="#F1F5F9" stroke="#CBD5E1" stroke-width="1.5"/>
+  <text x="86" y="468" class="p">人话：你不能一边让模型按某句话做事，一边让这句话只存在于某次运行的内存里。</text>
+  <text x="86" y="504" class="p">否则「它当时到底被叮嘱了什么」这件事，无法回放、无法审计、也无法在恢复后对齐。</text>
+  <text x="86" y="540" class="p">所以：模型可见 ⟺ 已经写进日志。</text>
+</svg>

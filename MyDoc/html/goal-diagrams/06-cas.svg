@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1320" height="640" viewBox="0 0 1320 640">
+  <rect width="1320" height="640" fill="#F8FAFC"/>
+  <style>
+    text{font-family:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif}
+    .t{font-size:26px;font-weight:700;fill:#0F172A}
+    .st{font-size:16px;fill:#64748B}
+    .h{font-size:20px;font-weight:700}
+    .p{font-size:16px;fill:#334155}
+    .no{font-size:15px;fill:#9F1239}
+    .ok{font-size:15px;fill:#166534}
+  </style>
+  <text x="56" y="48" class="t">同时改一份目标：过期的那份直接丢掉</text>
+  <text x="56" y="74" class="st">是：先读到第几版，改的时候核对还是这一版。不是：谁后写谁赢，也不是加一把大锁排队。</text>
+
+  <rect x="56" y="110" width="380" height="200" rx="14" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
+  <text x="86" y="154" class="h" fill="#3730A3">现在账上</text>
+  <text x="86" y="196" class="p">目标 id = G1</text>
+  <text x="86" y="228" class="p">版本 revision = 3</text>
+  <text x="86" y="260" class="p">phase = active</text>
+
+  <rect x="470" y="110" width="380" height="200" rx="14" fill="#ECFDF5" stroke="#16A34A" stroke-width="2"/>
+  <text x="500" y="154" class="h" fill="#166534">甲先读到 3，再提交 3→4</text>
+  <text x="500" y="196" class="ok">对得上，收下</text>
+  <text x="500" y="228" class="p">账上变成 revision = 4</text>
+  <text x="500" y="260" class="p">甲的修改生效</text>
+
+  <rect x="884" y="110" width="380" height="200" rx="14" fill="#FEF2F2" stroke="#DC2626" stroke-width="2"/>
+  <text x="914" y="154" class="h" fill="#B91C1C">乙还拿着旧的 3 来改</text>
+  <text x="914" y="196" class="no">对不上，拒绝</text>
+  <text x="914" y="228" class="p">请乙重新读第 4 版</text>
+  <text x="914" y="260" class="p">乙不能把甲的改动盖掉</text>
+
+  <rect x="56" y="350" width="1208" height="230" rx="14" fill="#FFFBEB" stroke="#D97706" stroke-width="2"/>
+  <text x="86" y="398" class="h" fill="#92400E">人话</text>
+  <text x="86" y="440" class="p">像两个人同时改同一份文档。后保存的那份不该默默覆盖先保存的那份。</text>
+  <text x="86" y="476" class="p">正确做法：改之前记下「我看到的是第 3 版」。提交时如果已经是第 4 版，这份改动作废，重新读再改。</text>
+  <text x="86" y="512" class="no">不是加一把大锁，让全世界排队。也不是「谁手快谁赢」。</text>
+  <text x="86" y="548" class="p">模型被要求：先 get，再把读到的 id 和版本原样抄回去。</text>
+</svg>
