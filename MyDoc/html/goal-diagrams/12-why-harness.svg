@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1320" height="820" viewBox="0 0 1320 820">
+  <rect width="1320" height="820" fill="#F8FAFC"/>
+  <style>
+    text{font-family:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif}
+    .t{font-size:26px;font-weight:700;fill:#0F172A}
+    .st{font-size:16px;fill:#64748B}
+    .h{font-size:18px;font-weight:700}
+    .p{font-size:15px;fill:#334155}
+    .no{font-size:14px;fill:#9F1239}
+  </style>
+  <text x="56" y="48" class="t">为什么做成这样：用长期目标，压一遍 Harness 的承诺</text>
+  <text x="56" y="74" class="st">Harness 声称：新能力接插件，不改发动机。Goal 是那根探针。接得上，承诺才算数。</text>
+
+  <rect x="56" y="100" width="1208" height="72" rx="12" fill="#1E293B"/>
+  <text x="660" y="144" font-size="20" font-weight="700" fill="#FFFFFF" text-anchor="middle">探针：盯住一个目标连跑几天 —— 不许改 agent-loop</text>
+
+  <rect x="56" y="196" width="580" height="130" rx="12" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
+  <text x="80" y="232" class="h" fill="#3730A3">1. 一切都是插件</text>
+  <text x="80" y="264" class="p">服务记状态；命令 / 工具 / 调度只消费</text>
+  <text x="80" y="296" class="no">接不上，说明「不改 loop」只是口号</text>
+
+  <rect x="684" y="196" width="580" height="130" rx="12" fill="#ECFDF5" stroke="#16A34A" stroke-width="2"/>
+  <text x="708" y="232" class="h" fill="#166534">2. 模型可见 ⟺ 已落日志</text>
+  <text x="708" y="264" class="p">续跑时念的目标，必须能从会话日志翻出来</text>
+  <text x="708" y="296" class="no">只活在内存里，fork / 恢复对不齐</text>
+
+  <rect x="56" y="348" width="580" height="130" rx="12" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/>
+  <text x="80" y="384" class="h" fill="#92400E">3. 持久事实 ≠ 执行授权</text>
+  <text x="80" y="416" class="p">账可以回放；开机不准自己接着写</text>
+  <text x="80" y="448" class="no">授权跟着日志走，恢复就会偷跑</text>
+
+  <rect x="684" y="348" width="580" height="130" rx="12" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+  <text x="708" y="384" class="h" fill="#5B21B6">4. 续跑走公开事件，不走循环内脏</text>
+  <text x="708" y="416" class="p">空闲了，通过 agent/* 再开一轮</text>
+  <text x="708" y="448" class="no">伸进 loop 内部，插件就不是插件</text>
+
+  <rect x="56" y="500" width="580" height="130" rx="12" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+  <text x="80" y="536" class="h" fill="#1D4ED8">5. 权限看这一回合还活着</text>
+  <text x="80" y="568" class="p">提示词、血缘、拷出来的会话，都不能签发</text>
+  <text x="80" y="600" class="no">只靠「请你别乱改」，子代理会改题</text>
+
+  <rect x="684" y="500" width="580" height="130" rx="12" fill="#F0FDF4" stroke="#16A34A" stroke-width="2"/>
+  <text x="708" y="536" class="h" fill="#166534">6. 失败即停，配置非法即抛</text>
+  <text x="708" y="568" class="p">CAS 过期丢掉；卸载要等到真正静下来</text>
+  <text x="708" y="600" class="no">乐观重试和静默跳过，会把账写花</text>
+
+  <rect x="56" y="656" width="1208" height="120" rx="14" fill="#FFFBEB" stroke="#D97706" stroke-width="2"/>
+  <text x="80" y="700" font-size="18" font-weight="700" fill="#92400E">过了这六关，Harness 才是运行时，不只是套了工具的聊天循环</text>
+  <text x="80" y="736" class="p">Goal 不是再做一个待办列表。它是：长期目标能不能当插件接上，而不拆开发动机。</text>
+</svg>
